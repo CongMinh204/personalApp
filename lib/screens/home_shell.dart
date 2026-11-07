@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../data/sample_tasks.dart';
+import '../data/default_tags.dart';
+import '../data/fake/sample_data.dart';
 import '../features/today/today_screen.dart';
 
 class HomeShell extends StatefulWidget {
@@ -24,6 +25,7 @@ class _HomeShellState extends State<HomeShell> {
         children: [
           TodayScreen(
             initialTasks: _initialTasks,
+            tags: defaultTags,
             onToggleTheme: widget.onToggleTheme,
           ),
           const _ComingSoon(title: 'Lịch', icon: Icons.calendar_month_rounded),

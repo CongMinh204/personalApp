@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:personal_app/data/sample_tasks.dart';
+import 'package:personal_app/data/default_tags.dart';
+import 'package:personal_app/data/fake/sample_data.dart';
+import 'package:personal_app/data/models/task.dart';
 import 'package:personal_app/features/today/task_groups.dart';
-import 'package:personal_app/models/task.dart';
 import 'package:personal_app/utils/vi_date.dart';
 
 void main() {
@@ -25,10 +26,11 @@ void main() {
       final doneYesterday = Task(
         id: 'x',
         title: 'Đã xong hôm qua',
-        tag: TaskTag.work,
+        tagId: DefaultTagIds.work,
         due: DateTime(2026, 10, 28, 9),
         hasTime: true,
         done: true,
+        createdAt: now,
       );
       final groups = groupTasks([...tasks, doneYesterday], now);
       expect(titles(groups.overdue), isNot(contains('Đã xong hôm qua')));
@@ -50,7 +52,7 @@ void main() {
     });
 
     test('việc không có ngày thuộc Hôm nay', () {
-      const noDate = Task(id: 'n', title: 'Không ngày', tag: TaskTag.personal);
+      final noDate = Task(id: 'n', title: 'Không ngày', createdAt: now);
       final groups = groupTasks([noDate], now);
       expect(titles(groups.today), ['Không ngày']);
     });
@@ -110,9 +112,10 @@ void main() {
       final tomorrow = Task(
         id: 't',
         title: 'Ngày mai',
-        tag: TaskTag.study,
+        tagId: DefaultTagIds.study,
         due: DateTime(2026, 10, 30, 8),
         hasTime: true,
+        createdAt: now,
       );
       expect(taskTimeLabel(tomorrow, now), 'Ngày mai · 08:00');
     });

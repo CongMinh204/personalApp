@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/task.dart';
+import '../../../data/models/tag.dart';
+import '../../../data/models/task.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/vi_date.dart';
 
@@ -8,12 +9,16 @@ class TaskTile extends StatelessWidget {
   const TaskTile({
     super.key,
     required this.task,
+    this.tag,
     required this.now,
     required this.onToggle,
     this.overdue = false,
   });
 
   final Task task;
+
+  /// Nhãn của việc; `null` = Không nhãn (không hiện badge).
+  final Tag? tag;
   final DateTime now;
   final VoidCallback onToggle;
   final bool overdue;
@@ -25,7 +30,7 @@ class TaskTile extends StatelessWidget {
     final colors = TaskColors.of(context);
     final muted = scheme.onSurfaceVariant;
     final priorityColor = colors.priority(task.priority);
-    final (tagBackground, tagForeground) = colors.tag(task.tag, scheme);
+    final tag = this.tag;
 
     return Card(
       child: Padding(
@@ -75,42 +80,51 @@ class TaskTile extends StatelessWidget {
                         label: taskTimeLabel(task, now),
                         color: overdue ? scheme.error : muted,
                       ),
-                      if (task.subtasksTotal > 0)
+                      if (task.subtaskTotal > 0)
                         _Meta(
                           icon: Icons.checklist_rounded,
-                          label: '${task.subtasksDone}/${task.subtasksTotal}',
+                          label: '${task.subtaskDone}/${task.subtaskTotal}',
                           color: muted,
                         ),
-                      if (task.reminder)
+                      if (task.reminderMinutes != null)
                         Icon(
                           Icons.notifications_none_rounded,
                           size: 15,
                           color: muted,
                         ),
-                      if (task.repeat)
+                      if (task.repeatRule != RepeatRule.none)
                         Icon(Icons.repeat_rounded, size: 15, color: muted),
                     ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: tagBackground,
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(
-                task.tag.label,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: tagForeground,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+            if (tag != null) ...[const SizedBox(width: 8), _TagBadge(tag: tag)],
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _TagBadge extends StatelessWidget {
+  const _TagBadge({required this.tag});
+
+  final Tag tag;
+
+  @override
+  Widget build(BuildContext context) {
+    final (background, foreground) = TaskColors.of(context).tag(tag.color);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        tag.name,
+        style: Theme.of(context).textTheme.labelSmall
+            ?.copyWith(color: foreground, fontWeight: FontWeight.w600),
       ),
     );
   }

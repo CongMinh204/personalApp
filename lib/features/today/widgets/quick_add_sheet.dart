@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/task.dart';
+import '../../../data/ids.dart';
+import '../../../data/models/tag.dart';
+import '../../../data/models/task.dart';
 
 /// Mở sheet thêm nhanh; trả về [Task] mới (hạn hôm nay) hoặc `null` nếu hủy.
-Future<Task?> showQuickAddSheet(BuildContext context, {required DateTime now}) {
+Future<Task?> showQuickAddSheet(
+  BuildContext context, {
+  required DateTime now,
+  required List<Tag> tags,
+}) {
   return showModalBottomSheet<Task>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
     useSafeArea: true,
-    builder: (context) => QuickAddSheet(now: now),
+    builder: (context) => QuickAddSheet(now: now, tags: tags),
   );
 }
 
 class QuickAddSheet extends StatefulWidget {
-  const QuickAddSheet({super.key, required this.now});
+  const QuickAddSheet({super.key, required this.now, required this.tags});
 
   final DateTime now;
+  final List<Tag> tags;
 
   @override
   State<QuickAddSheet> createState() => _QuickAddSheetState();
@@ -25,7 +32,7 @@ class QuickAddSheet extends StatefulWidget {
 class _QuickAddSheetState extends State<QuickAddSheet> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
-  TaskTag _tag = TaskTag.personal;
+  String? _tagId;
   Priority _priority = Priority.medium;
   TimeOfDay? _time;
 
@@ -50,9 +57,9 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
     final now = widget.now;
     final time = _time;
     final task = Task(
-      id: 'task-${DateTime.now().microsecondsSinceEpoch}',
+      id: newId(),
       title: _titleController.text.trim(),
-      tag: _tag,
+      tagId: _tagId,
       due: DateTime(
         now.year,
         now.month,
@@ -62,6 +69,7 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
       ),
       hasTime: time != null,
       priority: _priority,
+      createdAt: now,
     );
     Navigator.of(context).pop(task);
   }
@@ -105,21 +113,24 @@ class _QuickAddSheetState extends State<QuickAddSheet> {
                   : null,
               onFieldSubmitted: (_) => _save(),
             ),
-            const SizedBox(height: 16),
-            Text('Nhãn', style: sectionStyle),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final tag in TaskTag.values)
-                  ChoiceChip(
-                    label: Text(tag.label),
-                    selected: _tag == tag,
-                    onSelected: (_) => setState(() => _tag = tag),
-                  ),
-              ],
-            ),
+            if (widget.tags.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text('Nhãn', style: sectionStyle),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final tag in widget.tags)
+                    ChoiceChip(
+                      label: Text(tag.name),
+                      selected: _tagId == tag.id,
+                      onSelected: (selected) =>
+                          setState(() => _tagId = selected ? tag.id : null),
+                    ),
+                ],
+              ),
+            ],
             const SizedBox(height: 16),
             Text('Ưu tiên', style: sectionStyle),
             const SizedBox(height: 8),

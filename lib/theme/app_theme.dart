@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../models/task.dart';
+import '../data/models/tag.dart';
+import '../data/models/task.dart';
 
 class AppTheme {
   AppTheme._();
@@ -88,49 +89,57 @@ class AppTheme {
   }
 }
 
-/// Màu riêng của app: màu ưu tiên và màu nền/chữ của nhãn.
+/// Màu riêng của app: màu ưu tiên, thẻ "Xong hết" và các tông màu nhãn.
 @immutable
 class TaskColors extends ThemeExtension<TaskColors> {
   const TaskColors({
     required this.high,
     required this.medium,
     required this.low,
-    required this.orange,
-    required this.onOrange,
     required this.green,
     required this.onGreen,
+    required this.tagTones,
   });
 
   final Color high;
   final Color medium;
   final Color low;
 
-  /// Cam nhạt (nền nhãn) và màu chữ đi kèm.
-  final Color orange;
-  final Color onOrange;
-
-  /// Xanh lá nhạt (nền nhãn, thẻ "Xong hết") và màu chữ đi kèm.
+  /// Xanh lá nhạt (thẻ "Xong hết") và màu chữ đi kèm.
   final Color green;
   final Color onGreen;
+
+  /// (nền, chữ) của từng tông màu nhãn. Tông cố định, không đổi theo màu nhấn.
+  final Map<TagColor, (Color, Color)> tagTones;
 
   static const light = TaskColors(
     high: Color(0xFFC2302B),
     medium: Color(0xFFA35A00),
     low: Color(0xFF5D5D70),
-    orange: Color(0xFFFFE9D2),
-    onOrange: Color(0xFF8A4500),
     green: Color(0xFFDDF4E3),
     onGreen: Color(0xFF1C6B36),
+    tagTones: {
+      TagColor.violet: (Color(0xFFE8E6FF), Color(0xFF2B2199)),
+      TagColor.orange: (Color(0xFFFFF1DB), Color(0xFFA35A00)),
+      TagColor.green: (Color(0xFFE1F4EA), Color(0xFF23774F)),
+      TagColor.red: (Color(0xFFFDE8E7), Color(0xFFC2302B)),
+      TagColor.grey: (Color(0xFFEEEDF7), Color(0xFF1A1A24)),
+    },
   );
 
   static const dark = TaskColors(
     high: Color(0xFFFF8F87),
     medium: Color(0xFFF5B544),
     low: Color(0xFFA6A6B8),
-    orange: Color(0xFF3B2A17),
-    onOrange: Color(0xFFFFC78A),
     green: Color(0xFF16301F),
     onGreen: Color(0xFF8FDCA6),
+    tagTones: {
+      TagColor.violet: (Color(0xFF302A70), Color(0xFFDEDBFF)),
+      TagColor.orange: (Color(0xFF3A2A10), Color(0xFFF5B544)),
+      TagColor.green: (Color(0xFF15301F), Color(0xFF6FD6A1)),
+      TagColor.red: (Color(0xFF3D1C1B), Color(0xFFFF8F87)),
+      TagColor.grey: (Color(0xFF25252F), Color(0xFFECECF4)),
+    },
   );
 
   static TaskColors of(BuildContext context) {
@@ -145,35 +154,25 @@ class TaskColors extends ThemeExtension<TaskColors> {
     Priority.low => low,
   };
 
-  /// (nền, chữ) của badge nhãn.
-  (Color, Color) tag(TaskTag tag, ColorScheme scheme) => switch (tag) {
-    TaskTag.study => (scheme.primary.withValues(alpha: 0.12), scheme.primary),
-    TaskTag.work => (orange, onOrange),
-    TaskTag.health => (green, onGreen),
-    TaskTag.personal => (
-      scheme.surfaceContainerHighest,
-      scheme.onSurfaceVariant,
-    ),
-  };
+  /// (nền, chữ) của badge nhãn có tông [color].
+  (Color, Color) tag(TagColor color) => tagTones[color]!;
 
   @override
   TaskColors copyWith({
     Color? high,
     Color? medium,
     Color? low,
-    Color? orange,
-    Color? onOrange,
     Color? green,
     Color? onGreen,
+    Map<TagColor, (Color, Color)>? tagTones,
   }) {
     return TaskColors(
       high: high ?? this.high,
       medium: medium ?? this.medium,
       low: low ?? this.low,
-      orange: orange ?? this.orange,
-      onOrange: onOrange ?? this.onOrange,
       green: green ?? this.green,
       onGreen: onGreen ?? this.onGreen,
+      tagTones: tagTones ?? this.tagTones,
     );
   }
 
@@ -184,10 +183,15 @@ class TaskColors extends ThemeExtension<TaskColors> {
       high: Color.lerp(high, other.high, t)!,
       medium: Color.lerp(medium, other.medium, t)!,
       low: Color.lerp(low, other.low, t)!,
-      orange: Color.lerp(orange, other.orange, t)!,
-      onOrange: Color.lerp(onOrange, other.onOrange, t)!,
       green: Color.lerp(green, other.green, t)!,
       onGreen: Color.lerp(onGreen, other.onGreen, t)!,
+      tagTones: {
+        for (final color in TagColor.values)
+          color: (
+            Color.lerp(tag(color).$1, other.tag(color).$1, t)!,
+            Color.lerp(tag(color).$2, other.tag(color).$2, t)!,
+          ),
+      },
     );
   }
 }

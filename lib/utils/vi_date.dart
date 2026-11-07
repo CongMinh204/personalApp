@@ -1,4 +1,4 @@
-import '../models/task.dart';
+import '../data/models/task.dart';
 
 const _weekdays = [
   'Thứ Hai',

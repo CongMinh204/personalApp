@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../models/task.dart';
+import '../../data/models/tag.dart';
+import '../../data/models/task.dart';
 import '../../utils/vi_date.dart';
 import 'task_groups.dart';
 import 'widgets/empty_state.dart';
@@ -12,11 +13,15 @@ class TodayScreen extends StatefulWidget {
   const TodayScreen({
     super.key,
     required this.initialTasks,
+    this.tags = const [],
     this.clock = DateTime.now,
     this.onToggleTheme,
   });
 
   final List<Task> initialTasks;
+
+  /// Nhãn để lọc, hiện badge và chọn khi thêm nhanh.
+  final List<Tag> tags;
 
   /// Nguồn thời gian hiện tại; thay bằng giờ cố định khi test.
   final DateTime Function() clock;
@@ -30,7 +35,7 @@ class _TodayScreenState extends State<TodayScreen> {
   // Messenger riêng để SnackBar hiện trong Scaffold này và đẩy FAB lên.
   final _messengerKey = GlobalKey<ScaffoldMessengerState>();
   late final List<Task> _tasks = List.of(widget.initialTasks);
-  TaskTag? _filter;
+  String? _filterTagId;
 
   void _toggleDone(Task task) {
     final index = _tasks.indexWhere((t) => t.id == task.id);
@@ -59,7 +64,11 @@ class _TodayScreenState extends State<TodayScreen> {
   }
 
   Future<void> _openQuickAdd() async {
-    final task = await showQuickAddSheet(context, now: widget.clock());
+    final task = await showQuickAddSheet(
+      context,
+      now: widget.clock(),
+      tags: widget.tags,
+    );
     if (task == null || !mounted) return;
     setState(() => _tasks.add(task));
   }
@@ -75,11 +84,12 @@ class _TodayScreenState extends State<TodayScreen> {
   @override
   Widget build(BuildContext context) {
     final now = widget.clock();
+    final tagById = {for (final tag in widget.tags) tag.id: tag};
     final all = groupTasks(_tasks, now);
-    final filter = _filter;
+    final filter = tagById[_filterTagId];
     final groups = filter == null
         ? all
-        : groupTasks(_tasks.where((t) => t.tag == filter).toList(), now);
+        : groupTasks(_tasks.where((t) => t.tagId == filter.id).toList(), now);
     final scheme = Theme.of(context).colorScheme;
 
     return ScaffoldMessenger(
@@ -105,8 +115,9 @@ class _TodayScreenState extends State<TodayScreen> {
               ),
               SliverToBoxAdapter(
                 child: _TagFilter(
-                  selected: filter,
-                  onSelected: (tag) => setState(() => _filter = tag),
+                  tags: widget.tags,
+                  selected: filter?.id,
+                  onSelected: (id) => setState(() => _filterTagId = id),
                 ),
               ),
               SliverPadding(
@@ -128,6 +139,7 @@ class _TodayScreenState extends State<TodayScreen> {
                   title: 'Quá hạn · ${groups.overdue.length}',
                   color: scheme.error,
                   tasks: groups.overdue,
+                  tagById: tagById,
                   now: now,
                   overdue: true,
                 ),
@@ -135,10 +147,16 @@ class _TodayScreenState extends State<TodayScreen> {
                 ..._section(
                   title: 'Hôm nay · ${groups.today.length}',
                   tasks: groups.today,
+                  tagById: tagById,
                   now: now,
                 ),
               if (groups.upcoming.isNotEmpty)
-                ..._section(title: 'Sắp tới', tasks: groups.upcoming, now: now),
+                ..._section(
+                  title: 'Sắp tới',
+                  tasks: groups.upcoming,
+                  tagById: tagById,
+                  now: now,
+                ),
               if (filter != null &&
                   groups.overdue.isEmpty &&
                   groups.today.isEmpty &&
@@ -147,7 +165,7 @@ class _TodayScreenState extends State<TodayScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
                   sliver: SliverToBoxAdapter(
                     child: Text(
-                      'Chưa có việc nào với nhãn "${filter.label}"',
+                      'Chưa có việc nào với nhãn "${filter.name}"',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: scheme.onSurfaceVariant),
                     ),
@@ -164,6 +182,7 @@ class _TodayScreenState extends State<TodayScreen> {
   List<Widget> _section({
     required String title,
     required List<Task> tasks,
+    required Map<String, Tag> tagById,
     required DateTime now,
     Color? color,
     bool overdue = false,
@@ -186,6 +205,7 @@ class _TodayScreenState extends State<TodayScreen> {
               onDismissed: (_) => _delete(task),
               child: TaskTile(
                 task: task,
+                tag: tagById[task.tagId],
                 now: now,
                 overdue: overdue,
                 onToggle: () => _toggleDone(task),
@@ -274,14 +294,21 @@ class _Header extends StatelessWidget {
 }
 
 class _TagFilter extends StatelessWidget {
-  const _TagFilter({required this.selected, required this.onSelected});
+  const _TagFilter({
+    required this.tags,
+    required this.selected,
+    required this.onSelected,
+  });
 
-  final TaskTag? selected;
-  final ValueChanged<TaskTag?> onSelected;
+  final List<Tag> tags;
+
+  /// Id nhãn đang lọc; `null` = Tất cả.
+  final String? selected;
+  final ValueChanged<String?> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    final options = <TaskTag?>[null, ...TaskTag.values];
+    final options = <Tag?>[null, ...tags];
     return SizedBox(
       height: 40,
       child: ListView.separated(
@@ -292,9 +319,9 @@ class _TagFilter extends StatelessWidget {
         itemBuilder: (context, index) {
           final tag = options[index];
           return ChoiceChip(
-            label: Text(tag?.label ?? 'Tất cả'),
-            selected: selected == tag,
-            onSelected: (_) => onSelected(tag),
+            label: Text(tag?.name ?? 'Tất cả'),
+            selected: selected == tag?.id,
+            onSelected: (_) => onSelected(tag?.id),
           );
         },
       ),

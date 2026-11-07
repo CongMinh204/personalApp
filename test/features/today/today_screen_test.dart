@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:personal_app/data/sample_tasks.dart';
+import 'package:personal_app/data/default_tags.dart';
+import 'package:personal_app/data/fake/sample_data.dart';
+import 'package:personal_app/data/models/task.dart';
 import 'package:personal_app/features/today/today_screen.dart';
 import 'package:personal_app/features/today/widgets/task_tile.dart';
-import 'package:personal_app/models/task.dart';
 import 'package:personal_app/theme/app_theme.dart';
 
 void main() {
@@ -22,7 +23,11 @@ void main() {
         locale: const Locale('vi'),
         supportedLocales: const [Locale('vi')],
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
-        home: TodayScreen(initialTasks: tasks, clock: () => now),
+        home: TodayScreen(
+          initialTasks: tasks,
+          tags: defaultTags,
+          clock: () => now,
+        ),
       ),
     );
     await tester.pumpAndSettle();
