@@ -89,9 +89,9 @@ flutter test      # All tests passed! (14 test)
 main.dart                  MaterialApp, theme, locale vi
 theme/app_theme.dart       màu, theme sáng/tối, TaskColors
 models/task.dart           Task, Priority, TaskTag
-logic/task_groups.dart     groupTasks, nextTask
-utils/vi_date.dart         định dạng ngày giờ tiếng Việt
+utils/vi_date.dart         định dạng ngày giờ tiếng Việt (dùng chung)
 data/sample_tasks.dart     dữ liệu mẫu
-widgets/                   task_tile, progress_card, empty_state, quick_add_sheet
-screens/                   home_shell, today_screen
+screens/home_shell.dart    khung 5 tab
+features/today/            màn Hôm nay: today_screen, task_groups (groupTasks, nextTask)
+features/today/widgets/    task_tile, progress_card, empty_state, quick_add_sheet
 ```

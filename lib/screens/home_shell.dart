@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/sample_tasks.dart';
-import 'today_screen.dart';
+import '../features/today/today_screen.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key, this.onToggleTheme});

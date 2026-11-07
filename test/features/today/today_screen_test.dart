@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:personal_app/data/sample_tasks.dart';
+import 'package:personal_app/features/today/today_screen.dart';
+import 'package:personal_app/features/today/widgets/task_tile.dart';
 import 'package:personal_app/models/task.dart';
-import 'package:personal_app/screens/today_screen.dart';
 import 'package:personal_app/theme/app_theme.dart';
-import 'package:personal_app/widgets/task_tile.dart';
 
 void main() {
   final now = DateTime(2026, 10, 29, 13, 40);

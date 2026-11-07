@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../models/task.dart';
-import '../theme/app_theme.dart';
-import '../utils/vi_date.dart';
+import '../../../models/task.dart';
+import '../../../theme/app_theme.dart';
+import '../../../utils/vi_date.dart';
 
 class ProgressCard extends StatelessWidget {
   const ProgressCard({

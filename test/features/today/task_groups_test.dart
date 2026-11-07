@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:personal_app/data/sample_tasks.dart';
-import 'package:personal_app/logic/task_groups.dart';
+import 'package:personal_app/features/today/task_groups.dart';
 import 'package:personal_app/models/task.dart';
 import 'package:personal_app/utils/vi_date.dart';
 
