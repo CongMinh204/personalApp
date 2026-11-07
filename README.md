@@ -13,7 +13,8 @@ Hiện mới có màn **Hôm nay**. Các tab Lịch, Hẹn giờ, Thống kê, C
   - Ba nhóm việc: Quá hạn, Hôm nay, Sắp tới.
   - Bấm checkbox để hoàn thành, vuốt trái để xóa (có "Hoàn tác").
   - Nút "+" mở form thêm nhanh: tên việc, nhãn, ưu tiên, giờ.
-- Dữ liệu hiện chỉ nằm trong bộ nhớ, lấy từ `lib/data/sample_tasks.dart`. Tắt app là mất thay đổi.
+- Dữ liệu hiện chỉ nằm trong bộ nhớ (dữ liệu mẫu ở `lib/data/fake/sample_data.dart`). Tắt app là mất thay đổi.
+- Model, bảng và repository dùng chung của nhóm: [docs/DATA_CONTRACT.md](docs/DATA_CONTRACT.md).
 
 ## Hướng dẫn chạy dự án
 
@@ -74,7 +75,7 @@ Trong VS Code, lưu file (Ctrl+S) là tự hot reload.
 
 ```bash
 flutter analyze   # No issues found!
-flutter test      # All tests passed! (14 test)
+flutter test      # All tests passed!
 ```
 
 ### Gặp lỗi
@@ -88,9 +89,10 @@ flutter test      # All tests passed! (14 test)
 ```
 main.dart                  MaterialApp, theme, locale vi
 theme/app_theme.dart       màu, theme sáng/tối, TaskColors
-models/task.dart           Task, Priority, TaskTag
-utils/vi_date.dart         định dạng ngày giờ tiếng Việt (dùng chung)
-data/sample_tasks.dart     dữ liệu mẫu
+data/models/               Task, Subtask, Tag, FocusSession, Habit, HabitLog
+data/repositories/         interface repository (xem docs/DATA_CONTRACT.md)
+data/fake/                 bản Fake trong bộ nhớ và dữ liệu mẫu
+utils/                     vi_date (ngày giờ tiếng Việt), dates (khoảng ngày) — dùng chung
 screens/home_shell.dart    khung 5 tab
 features/today/            màn Hôm nay: today_screen, task_groups (groupTasks, nextTask)
 features/today/widgets/    task_tile, progress_card, empty_state, quick_add_sheet
