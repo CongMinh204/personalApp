@@ -126,7 +126,7 @@ Từ bước 1, lấy repository qua Provider, ví dụ `context.read<TaskReposi
 | Hàm | Màn dùng | Ý nghĩa |
 |---|---|---|
 | `watchAll()` | Hôm nay | mọi việc, cả việc đã xong; chia nhóm Quá hạn/Hôm nay/Sắp tới làm trong bộ nhớ (`groupTasks`) |
-| `getAll()` | Cài đặt (xuất CSV) | như `watchAll`, đọc một lần |
+| `getAll()` | chưa màn nào dùng | như `watchAll`, đọc một lần (dự phòng) |
 | `watchByDay(day)` | Lịch (timeline) | việc có `due` trong ngày, sắp theo `due`; không gồm việc không có ngày |
 | `watchByRange(range)` | Lịch tháng/tuần (chấm dưới ngày) | việc có `due` trong khoảng |
 | `getUnfinished()` | Nhắc việc (C) | việc chưa xong, để lên lịch lại thông báo khi mở app |

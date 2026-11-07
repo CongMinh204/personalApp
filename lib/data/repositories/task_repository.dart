@@ -8,7 +8,7 @@ abstract interface class TaskRepository {
   /// Mọi việc (cả đã xong). Màn Hôm nay tự nhóm Quá hạn/Hôm nay/Sắp tới.
   Stream<List<Task>> watchAll();
 
-  /// Mọi việc, đọc một lần (ví dụ để xuất CSV).
+  /// Mọi việc, đọc một lần (dự phòng, chưa màn nào dùng).
   Future<List<Task>> getAll();
 
   /// Việc có `due` trong ngày [day] (không gồm việc không có ngày), sắp theo
