@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../app/shell_controller.dart';
 import '../data/default_tags.dart';
 import '../data/fake/sample_data.dart';
 import '../features/today/today_screen.dart';
 
+/// Khung 5 tab. Tab đang mở do [ShellController] giữ để màn nào cũng chuyển
+/// tab được.
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key, this.onToggleTheme});
-
-  final VoidCallback? onToggleTheme;
+  const HomeShell({super.key});
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -15,28 +17,27 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   final _initialTasks = sampleTasks(DateTime.now());
-  int _index = 0;
 
   @override
   Widget build(BuildContext context) {
+    final shell = context.watch<ShellController>();
     return Scaffold(
       body: IndexedStack(
-        index: _index,
+        index: shell.tab.index,
         children: [
-          TodayScreen(
-            initialTasks: _initialTasks,
-            tags: defaultTags,
-            onToggleTheme: widget.onToggleTheme,
-          ),
+          TodayScreen(initialTasks: _initialTasks, tags: defaultTags),
           const _ComingSoon(title: 'Lịch', icon: Icons.calendar_month_rounded),
           const _ComingSoon(title: 'Hẹn giờ', icon: Icons.timer_outlined),
           const _ComingSoon(title: 'Thống kê', icon: Icons.insights_rounded),
-          const _ComingSoon(title: 'Cài đặt', icon: Icons.settings_outlined),
+          const _ComingSoon(
+            title: 'Thói quen',
+            icon: Icons.local_fire_department_rounded,
+          ),
         ],
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (index) => setState(() => _index = index),
+        selectedIndex: shell.tab.index,
+        onDestinationSelected: (index) => shell.select(HomeTab.values[index]),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.today_outlined),
@@ -59,9 +60,9 @@ class _HomeShellState extends State<HomeShell> {
             label: 'Thống kê',
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings_rounded),
-            label: 'Cài đặt',
+            icon: Icon(Icons.local_fire_department_outlined),
+            selectedIcon: Icon(Icons.local_fire_department_rounded),
+            label: 'Thói quen',
           ),
         ],
       ),
