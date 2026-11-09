@@ -20,9 +20,15 @@ void main() {
       expect(validateTagName('CÔNG VIỆC', defaultTags), isNotNull);
     });
 
-    test('trùng cả khi chữ có dấu khác hoa thường, bỏ khoảng trắng hai đầu', () {
-      expect(validateTagName('  HỌC TẬP  ', defaultTags), contains('Học tập'));
-    });
+    test(
+      'trùng cả khi chữ có dấu khác hoa thường, bỏ khoảng trắng hai đầu',
+      () {
+        expect(
+          validateTagName('  HỌC TẬP  ', defaultTags),
+          contains('Học tập'),
+        );
+      },
+    );
 
     test('chữ có dấu và không dấu là hai tên khác nhau', () {
       expect(validateTagName('Hoc tap', defaultTags), isNull);
