@@ -2,7 +2,7 @@
 
 Ứng dụng todo cá nhân viết bằng Flutter, giao diện tiếng Việt, tối giản, bo góc lớn, màu nhấn xanh tím.
 
-Hiện mới có màn **Hôm nay**. Các tab Lịch, Hẹn giờ, Thống kê, Thói quen và các màn con (Cài đặt, Tìm kiếm...) đang hiện "Sắp có".
+Hiện có các màn **Hôm nay**, **Cài đặt** và **Quản lý nhãn**. Các tab Lịch, Hẹn giờ, Thống kê, Thói quen và các màn con khác (Tìm kiếm, Chi tiết việc...) đang hiện "Sắp có".
 
 ## Tính năng
 
@@ -101,4 +101,5 @@ app/shell_controller.dart  tab đang mở; app/routes.dart tên các màn không
 features/timer/            TimerController.prepare(taskId): chọn sẵn việc rồi mở tab Hẹn giờ
 features/today/            màn Hôm nay: today_screen, task_groups (groupTasks, nextTask)
 features/today/widgets/    task_tile, progress_card, empty_state, quick_add_sheet
+features/settings/         settings_screen, tag_manager_screen, tag_validation (kiểm tra tên nhãn), widgets/
 ```
