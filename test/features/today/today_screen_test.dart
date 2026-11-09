@@ -4,6 +4,7 @@ import 'package:personal_app/app/shell_controller.dart';
 import 'package:personal_app/data/default_tags.dart';
 import 'package:personal_app/data/models/tag.dart';
 import 'package:personal_app/data/models/task.dart';
+import 'package:personal_app/features/search/search_screen.dart';
 import 'package:personal_app/features/tasks/task_detail_screen.dart';
 import 'package:personal_app/features/tasks/task_edit_screen.dart';
 import 'package:personal_app/features/today/today_screen.dart';
@@ -190,13 +191,13 @@ void main() {
       expect(find.widgetWithText(AppBar, 'Chi tiết việc'), findsOneWidget);
     });
 
-    testWidgets('nút Tìm kiếm mở trang Tìm kiếm', (tester) async {
+    testWidgets('nút Tìm kiếm mở màn Tìm kiếm', (tester) async {
       await pumpToday(tester);
 
       await tester.tap(find.byTooltip('Tìm kiếm'));
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(AppBar, 'Tìm kiếm'), findsOneWidget);
+      expect(find.byType(SearchScreen), findsOneWidget);
     });
 
     testWidgets('nút đồng hồ chọn sẵn việc và chuyển sang tab Hẹn giờ', (

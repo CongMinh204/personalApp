@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:sqflite/sqflite.dart';
 
 import '../../utils/dates.dart';
+import '../../utils/text_search.dart';
 import '../models/db_values.dart';
 import '../models/subtask.dart';
 import '../models/task.dart';
@@ -70,17 +71,18 @@ class SqliteTaskRepository implements TaskRepository {
   Stream<Task?> watchById(String id) => _app.changes.watch(() => getById(id));
 
   /// Lọc trong Dart thay vì `LIKE`: SQLite chỉ bỏ qua hoa thường với chữ không
-  /// dấu, nên "ÔN TẬP" không khớp "ôn tập". Dữ liệu cá nhân nhỏ nên không chậm.
+  /// dấu, còn tìm kiếm cần bỏ qua cả hoa thường lẫn dấu tiếng Việt ("hoc tap"
+  /// tìm ra "Học tập"). Dữ liệu cá nhân nhỏ nên không chậm.
   @override
   Future<List<Task>> search(String query) async {
-    final needle = query.trim().toLowerCase();
+    final needle = foldVietnamese(query.trim());
     if (needle.isEmpty) return [];
     final rows = await _db.rawQuery('$_selectTask $_orderByDue');
     return [
       for (final row in rows)
-        if ((row['title'] as String).toLowerCase().contains(needle) ||
-            (row['note'] as String).toLowerCase().contains(needle) ||
-            ((row['tag_name'] as String?) ?? '').toLowerCase().contains(needle))
+        if (containsFolded(row['title'] as String, needle) ||
+            containsFolded(row['note'] as String, needle) ||
+            containsFolded((row['tag_name'] as String?) ?? '', needle))
           Task.fromMap(row),
     ];
   }
