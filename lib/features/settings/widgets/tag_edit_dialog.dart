@@ -5,7 +5,8 @@ import '../../../data/models/tag.dart';
 import '../tag_validation.dart';
 import 'tag_color_picker.dart';
 
-/// Hộp thoại sửa tên và màu của một nhãn.
+/// Hộp thoại nhập tên và màu của một nhãn (sửa nhãn có sẵn hoặc tạo nhãn mới
+/// với [title] khác).
 ///
 /// [onSave] lưu nhãn và trả về thông báo lỗi (ví dụ tên trùng) hoặc `null` nếu
 /// thành công. Có lỗi thì hộp thoại giữ nguyên để người dùng sửa, không đóng.
@@ -14,21 +15,28 @@ Future<void> showTagEditDialog(
   required Tag tag,
   required Iterable<Tag> existing,
   required Future<String?> Function(String name, TagColor color) onSave,
+  String title = 'Sửa nhãn',
 }) {
   return showDialog<void>(
     context: context,
-    builder: (_) =>
-        _TagEditDialog(tag: tag, existing: existing, onSave: onSave),
+    builder: (_) => _TagEditDialog(
+      title: title,
+      tag: tag,
+      existing: existing,
+      onSave: onSave,
+    ),
   );
 }
 
 class _TagEditDialog extends StatefulWidget {
   const _TagEditDialog({
+    required this.title,
     required this.tag,
     required this.existing,
     required this.onSave,
   });
 
+  final String title;
   final Tag tag;
   final Iterable<Tag> existing;
   final Future<String?> Function(String name, TagColor color) onSave;
@@ -75,7 +83,7 @@ class _TagEditDialogState extends State<_TagEditDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Sửa nhãn'),
+      title: Text(widget.title),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
