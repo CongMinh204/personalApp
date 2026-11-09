@@ -33,6 +33,8 @@ class Task {
     this.subtasksTotal = 0,
     this.reminder = false,
     this.repeat = false,
+    this.isArchived = false,
+    this.note = '',
   });
 
   final String id;
@@ -52,20 +54,43 @@ class Task {
   final bool reminder;
   final bool repeat;
 
-  Task copyWith({bool? done}) {
+  /// Đã đưa vào kho lưu trữ hay chưa
+  final bool isArchived;
+
+  /// Ghi chú chi tiết của công việc
+  final String note;
+
+  Task copyWith({
+    String? id,
+    String? title,
+    TaskTag? tag,
+    DateTime? due,
+    DateTime? end,
+    bool? hasTime,
+    Priority? priority,
+    bool? done,
+    int? subtasksDone,
+    int? subtasksTotal,
+    bool? reminder,
+    bool? repeat,
+    bool? isArchived,
+    String? note,
+  }) {
     return Task(
-      id: id,
-      title: title,
-      tag: tag,
-      due: due,
-      end: end,
-      hasTime: hasTime,
-      priority: priority,
+      id: id ?? this.id,
+      title: title ?? this.title,
+      tag: tag ?? this.tag,
+      due: due ?? this.due,
+      end: end ?? this.end,
+      hasTime: hasTime ?? this.hasTime,
+      priority: priority ?? this.priority,
       done: done ?? this.done,
-      subtasksDone: subtasksDone,
-      subtasksTotal: subtasksTotal,
-      reminder: reminder,
-      repeat: repeat,
+      subtasksDone: subtasksDone ?? this.subtasksDone,
+      subtasksTotal: subtasksTotal ?? this.subtasksTotal,
+      reminder: reminder ?? this.reminder,
+      repeat: repeat ?? this.repeat,
+      isArchived: isArchived ?? this.isArchived,
+      note: note ?? this.note,
     );
   }
 }

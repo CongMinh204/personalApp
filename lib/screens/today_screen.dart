@@ -8,6 +8,12 @@ import '../widgets/progress_card.dart';
 import '../widgets/quick_add_sheet.dart';
 import '../widgets/task_tile.dart';
 
+// Import các màn hình và widget mới cho 4 tính năng
+import 'task_edit_screen.dart';
+import 'task_detail_screen.dart';
+import 'archive_screen.dart';
+import 'habit_screen.dart';
+
 class TodayScreen extends StatefulWidget {
   const TodayScreen({
     super.key,
@@ -58,10 +64,116 @@ class _TodayScreenState extends State<TodayScreen> {
       );
   }
 
+  // Cập nhật công việc sau khi xem chi tiết hoặc chỉnh sửa
+  void _updateTask(Task updated) {
+    final index = _tasks.indexWhere((t) => t.id == updated.id);
+    if (index < 0) return;
+    setState(() => _tasks[index] = updated);
+  }
+
+  // Chuyển sang màn hình xem chi tiết công việc
+  void _openDetail(Task task) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TaskDetailScreen(
+          task: task,
+          onTaskUpdated: _updateTask,
+          onTaskDeleted: () => _delete(task),
+        ),
+      ),
+    );
+  }
+
+  // Mở kho lưu trữ
+  void _openArchive() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ArchiveScreen(
+          archivedTasks: _tasks.where((t) => t.isArchived).toList(),
+          onUnarchive: (task) {
+            _updateTask(task.copyWith(isArchived: false));
+          },
+          onDeletePermanent: _delete,
+        ),
+      ),
+    );
+  }
+
+  // Menu mở rộng khi bấm nút "+" (FAB)
   Future<void> _openQuickAdd() async {
-    final task = await showQuickAddSheet(context, now: widget.clock());
-    if (task == null || !mounted) return;
-    setState(() => _tasks.add(task));
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const CircleAvatar(
+                    child: Icon(Icons.add_task_rounded),
+                  ),
+                  title: const Text(
+                    'Thêm công việc chi tiết',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text('Nhập đầy đủ giờ, độ ưu tiên, ghi chú'),
+                  onTap: () => Navigator.pop(ctx, 'detail_task'),
+                ),
+                ListTile(
+                  leading: const CircleAvatar(
+                    child: Icon(Icons.flash_on_rounded),
+                  ),
+                  title: const Text(
+                    'Thêm nhanh việc',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text('Tạo việc nhanh với ngày mặc định'),
+                  onTap: () => Navigator.pop(ctx, 'quick_task'),
+                ),
+                ListTile(
+                  leading: const CircleAvatar(
+                    child: Icon(Icons.repeat_rounded),
+                  ),
+                  title: const Text(
+                    'Thói quen mỗi ngày',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text('Theo dõi chuỗi streak thói quen'),
+                  onTap: () => Navigator.pop(ctx, 'habit'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (action == null || !mounted) return;
+
+    if (action == 'detail_task') {
+      final newTask = await Navigator.push<Task>(
+        context,
+        MaterialPageRoute(builder: (_) => const TaskEditScreen()),
+      );
+      if (newTask != null && mounted) {
+        setState(() => _tasks.add(newTask));
+      }
+    } else if (action == 'quick_task') {
+      final task = await showQuickAddSheet(context, now: widget.clock());
+      if (task != null && mounted) {
+        setState(() => _tasks.add(task));
+      }
+    } else if (action == 'habit') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const HabitScreen()),
+      );
+    }
   }
 
   void _showSearchSoon() {
@@ -75,11 +187,13 @@ class _TodayScreenState extends State<TodayScreen> {
   @override
   Widget build(BuildContext context) {
     final now = widget.clock();
-    final all = groupTasks(_tasks, now);
+    // Loại bỏ các task đã lưu trữ khỏi màn hình Hôm nay
+    final activeTasks = _tasks.where((t) => !t.isArchived).toList();
+    final all = groupTasks(activeTasks, now);
     final filter = _filter;
     final groups = filter == null
         ? all
-        : groupTasks(_tasks.where((t) => t.tag == filter).toList(), now);
+        : groupTasks(activeTasks.where((t) => t.tag == filter).toList(), now);
     final scheme = Theme.of(context).colorScheme;
 
     return ScaffoldMessenger(
@@ -88,7 +202,7 @@ class _TodayScreenState extends State<TodayScreen> {
         floatingActionButton: all.isTodayEmpty
             ? null
             : FloatingActionButton(
-                tooltip: 'Thêm việc',
+                tooltip: 'Thêm việc hoặc thói quen',
                 onPressed: _openQuickAdd,
                 child: const Icon(Icons.add_rounded, size: 28),
               ),
@@ -101,6 +215,7 @@ class _TodayScreenState extends State<TodayScreen> {
                   now: now,
                   onToggleTheme: widget.onToggleTheme,
                   onSearch: _showSearchSoon,
+                  onOpenArchive: _openArchive,
                 ),
               ),
               SliverToBoxAdapter(
@@ -184,11 +299,14 @@ class _TodayScreenState extends State<TodayScreen> {
               direction: DismissDirection.endToStart,
               background: const _DeleteBackground(),
               onDismissed: (_) => _delete(task),
-              child: TaskTile(
-                task: task,
-                now: now,
-                overdue: overdue,
-                onToggle: () => _toggleDone(task),
+              child: GestureDetector(
+                onTap: () => _openDetail(task),
+                child: TaskTile(
+                  task: task,
+                  now: now,
+                  overdue: overdue,
+                  onToggle: () => _toggleDone(task),
+                ),
               ),
             );
           },
@@ -203,11 +321,13 @@ class _Header extends StatelessWidget {
     required this.now,
     required this.onToggleTheme,
     required this.onSearch,
+    required this.onOpenArchive,
   });
 
   final DateTime now;
   final VoidCallback? onToggleTheme;
   final VoidCallback onSearch;
+  final VoidCallback onOpenArchive;
 
   @override
   Widget build(BuildContext context) {
@@ -249,6 +369,13 @@ class _Header extends StatelessWidget {
             icon: Icon(
               isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
             ),
+          ),
+          const SizedBox(width: 4),
+          IconButton(
+            tooltip: 'Kho lưu trữ',
+            style: buttonStyle,
+            onPressed: onOpenArchive,
+            icon: const Icon(Icons.archive_outlined),
           ),
           const SizedBox(width: 4),
           IconButton(
