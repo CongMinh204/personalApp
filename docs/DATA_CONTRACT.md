@@ -234,18 +234,25 @@ final habits = FakeHabitRepository(store);
 - Từ bước 1, chỗ duy nhất chọn Fake hay SQLite là `lib/app/dependencies.dart`; các màn không tự tạo repository.
 - Bộ test hợp đồng `test/data/repository_contract.dart` đang chạy cho bản Fake; từ bước 1 sẽ chạy thêm cho SQLite, để hai bản cư xử giống nhau.
 
-## 8. Cài đặt dùng chung (dự kiến, chốt ở bước 2)
+## 8. Cài đặt dùng chung
 
-Lưu bằng shared_preferences, đọc qua `SettingsController` (làm ở bước 2). Danh sách dưới đây chưa chốt, có thể thêm mục.
+Lưu bằng shared_preferences, đọc và ghi qua `SettingsController` (`lib/app/settings_controller.dart`, có sẵn trong Provider). Giá trị lưu hỏng hoặc ngoài khoảng thì dùng mặc định; setter nhận giá trị sai thì báo `ArgumentError`, không lưu.
 
-| Key | Kiểu | Mặc định | Ai đọc |
+| Key | Kiểu và khoảng hợp lệ | Mặc định | Ai đọc |
 |---|---|---|---|
 | `theme_mode` | `system` / `light` / `dark` | `system` | app |
-| `accent_color` | int ARGB | `0xFF5B4FE0` | app |
-| `week_start` | int: 1 = Thứ Hai, 7 = Chủ Nhật | 1 | C (Lịch, Thống kê) |
-| `default_reminder_minutes` | int | 15 | B (Thêm việc), C |
-| `morning_summary_time` | int, số phút từ 00:00 | 420 (07:00) | C |
-| `pomodoro_minutes` | int, 5–60 | 25 | D |
+| `accent_color` | một trong 5 màu ARGB: `0xFF5B4FE0`, `0xFF1E6FD9`, `0xFF23774F`, `0xFFC2410C`, `0xFFBE185D` | `0xFF5B4FE0` | app |
+| `week_start` | 1 = Thứ Hai hoặc 7 = Chủ Nhật | 1 | Lịch, Thống kê |
+| `default_reminder_minutes` | 0, 5, 15, 30, 60 hoặc 1440 | 15 | Thêm việc, Nhắc việc |
+| `reminders_enabled` | bool | `true` | Nhắc việc |
+| `morning_summary_enabled` | bool | `true` | Nhắc việc |
+| `morning_summary_time` | số phút từ 00:00, 0–1439 | 420 (07:00) | Nhắc việc |
+| `pomodoro_minutes` | 5–60 | 25 | Hẹn giờ |
+| `short_break_minutes` | 1–30 | 5 | Hẹn giờ |
+| `long_break_minutes` | 5–60 | 15 | Hẹn giờ |
+| `auto_next_session` | bool | `false` | Hẹn giờ |
+
+Màn Tìm kiếm tự lưu "tìm gần đây" bằng key bắt đầu bằng `search_`.
 
 ## 9. Lịch sử thay đổi
 
@@ -253,3 +260,4 @@ Lưu bằng shared_preferences, đọc qua `SettingsController` (làm ở bướ
 |---|---|---|
 | 1 | 07/11/2026 | Bản đầu, chờ nhóm duyệt |
 | 1.1 | 09/11/2026 | Dự án chuyển sang một người làm; hợp đồng không đổi schema, vẫn là khung thiết kế cho bước 1 trở đi |
+| 1.2 | 09/11/2026 | Chốt mục 8 (cài đặt dùng chung) khi làm `SettingsController`: thêm 5 key (`reminders_enabled`, `morning_summary_enabled`, `short_break_minutes`, `long_break_minutes`, `auto_next_session`) và khoảng hợp lệ của từng key. Schema database không đổi |
