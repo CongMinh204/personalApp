@@ -12,15 +12,18 @@ class AppTheme {
   static const _darkBackground = Color(0xFF111117);
   static const _darkCard = Color(0xFF1B1B23);
 
-  static ThemeData light() => _build(Brightness.light);
+  /// [accent] là màu nhấn người dùng chọn trong Cài đặt (mặc định [seed]).
+  static ThemeData light({Color accent = seed}) =>
+      _build(Brightness.light, accent);
 
-  static ThemeData dark() => _build(Brightness.dark);
+  static ThemeData dark({Color accent = seed}) =>
+      _build(Brightness.dark, accent);
 
-  static ThemeData _build(Brightness brightness) {
+  static ThemeData _build(Brightness brightness, Color accent) {
     final isDark = brightness == Brightness.dark;
-    // fidelity giữ primary sát màu seed (tonalSpot mặc định làm nhạt màu nhấn).
+    // fidelity giữ primary sát màu nhấn (tonalSpot mặc định làm nhạt màu).
     final scheme = ColorScheme.fromSeed(
-      seedColor: seed,
+      seedColor: accent,
       brightness: brightness,
       dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
     );

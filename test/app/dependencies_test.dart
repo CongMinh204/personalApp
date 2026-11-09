@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:personal_app/app/dependencies.dart';
+import 'package:personal_app/app/settings_controller.dart';
 import 'package:personal_app/data/default_tags.dart';
 import 'package:personal_app/data/repositories/tag_repository.dart';
 import 'package:personal_app/data/sqlite/app_database.dart';
 import 'package:personal_app/main.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
@@ -42,7 +44,13 @@ void main() {
     tester,
   ) async {
     final deps = AppDependencies.fake();
-    await tester.pumpWidget(PersonalApp(dependencies: deps));
+    SharedPreferences.setMockInitialValues({});
+    final settings = SettingsController.fromPrefs(
+      await SharedPreferences.getInstance(),
+    );
+    await tester.pumpWidget(
+      PersonalApp(dependencies: deps, settings: settings),
+    );
 
     final context = tester.element(find.byType(Scaffold).first);
     expect(context.read<TagRepository>(), same(deps.tags));

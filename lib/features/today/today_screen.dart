@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/routes.dart';
 import '../../data/models/tag.dart';
 import '../../data/models/task.dart';
 import '../../utils/vi_date.dart';
@@ -15,7 +16,6 @@ class TodayScreen extends StatefulWidget {
     required this.initialTasks,
     this.tags = const [],
     this.clock = DateTime.now,
-    this.onToggleTheme,
   });
 
   final List<Task> initialTasks;
@@ -25,7 +25,6 @@ class TodayScreen extends StatefulWidget {
 
   /// Nguồn thời gian hiện tại; thay bằng giờ cố định khi test.
   final DateTime Function() clock;
-  final VoidCallback? onToggleTheme;
 
   @override
   State<TodayScreen> createState() => _TodayScreenState();
@@ -109,8 +108,9 @@ class _TodayScreenState extends State<TodayScreen> {
               SliverToBoxAdapter(
                 child: _Header(
                   now: now,
-                  onToggleTheme: widget.onToggleTheme,
                   onSearch: _showSearchSoon,
+                  onOpenSettings: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.settings),
                 ),
               ),
               SliverToBoxAdapter(
@@ -221,19 +221,18 @@ class _TodayScreenState extends State<TodayScreen> {
 class _Header extends StatelessWidget {
   const _Header({
     required this.now,
-    required this.onToggleTheme,
     required this.onSearch,
+    required this.onOpenSettings,
   });
 
   final DateTime now;
-  final VoidCallback? onToggleTheme;
   final VoidCallback onSearch;
+  final VoidCallback onOpenSettings;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
     final buttonStyle = IconButton.styleFrom(
       backgroundColor: theme.cardTheme.color,
     );
@@ -263,29 +262,17 @@ class _Header extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: isDark ? 'Chế độ sáng' : 'Chế độ tối',
-            style: buttonStyle,
-            onPressed: onToggleTheme,
-            icon: Icon(
-              isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-            ),
-          ),
-          const SizedBox(width: 4),
-          IconButton(
             tooltip: 'Tìm kiếm',
             style: buttonStyle,
             onPressed: onSearch,
             icon: const Icon(Icons.search_rounded),
           ),
-          const SizedBox(width: 8),
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: scheme.primaryContainer,
-            foregroundColor: scheme.onPrimaryContainer,
-            child: const Text(
-              'A',
-              style: TextStyle(fontWeight: FontWeight.w700),
-            ),
+          const SizedBox(width: 4),
+          IconButton(
+            tooltip: 'Cài đặt',
+            style: buttonStyle,
+            onPressed: onOpenSettings,
+            icon: const Icon(Icons.settings_outlined),
           ),
         ],
       ),

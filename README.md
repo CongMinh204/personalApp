@@ -2,11 +2,11 @@
 
 Ứng dụng todo cá nhân viết bằng Flutter, giao diện tiếng Việt, tối giản, bo góc lớn, màu nhấn xanh tím.
 
-Hiện mới có màn **Hôm nay**. Các tab Lịch, Hẹn giờ, Thống kê, Cài đặt đang hiện "Sắp có".
+Hiện mới có màn **Hôm nay**. Các tab Lịch, Hẹn giờ, Thống kê, Thói quen và các màn con (Cài đặt, Tìm kiếm...) đang hiện "Sắp có".
 
 ## Tính năng
 
-- Thanh tab dưới cùng 5 mục, giao diện sáng/tối (mặc định theo hệ thống, đổi bằng nút trên header).
+- Thanh tab dưới cùng 5 mục: Hôm nay, Lịch, Hẹn giờ, Thống kê, Thói quen. Cài đặt mở từ biểu tượng bánh răng ở header Hôm nay; chủ đề sáng/tối và màu nhấn lưu trong cài đặt (mặc định theo hệ thống).
 - Màn Hôm nay:
   - Lọc theo nhãn: Học tập, Công việc, Cá nhân, Sức khỏe.
   - Thẻ tiến độ trong ngày, thẻ "Xong hết việc hôm nay!" và màn trống.
@@ -95,7 +95,10 @@ data/fake/                 bản Fake trong bộ nhớ và dữ liệu mẫu
 data/sqlite/               AppDatabase (6 bảng, khóa ngoại, index) và 4 repository SQLite
 app/dependencies.dart      chỗ duy nhất chọn SQLite hay Fake; main.dart đưa xuống bằng Provider
 utils/                     vi_date (ngày giờ tiếng Việt), dates (khoảng ngày) — dùng chung
-screens/home_shell.dart    khung 5 tab
+screens/home_shell.dart    khung 5 tab (tab đang mở do ShellController giữ)
+app/settings_controller.dart  cài đặt lưu bằng shared_preferences (key: docs/DATA_CONTRACT.md mục 8)
+app/shell_controller.dart  tab đang mở; app/routes.dart tên các màn không phải tab
+features/timer/            TimerController.prepare(taskId): chọn sẵn việc rồi mở tab Hẹn giờ
 features/today/            màn Hôm nay: today_screen, task_groups (groupTasks, nextTask)
 features/today/widgets/    task_tile, progress_card, empty_state, quick_add_sheet
 ```
