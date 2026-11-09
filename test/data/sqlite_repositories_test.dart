@@ -186,11 +186,13 @@ void main() {
         await repos.tasks.add(task('a', tagId: DefaultTagIds.study));
         final counts = <Map<String, int>>[];
         final sub = repos.tags.watchTaskCounts().listen(counts.add);
-        await pumpEventQueue();
+        // SQLite đọc ở luồng nền: chờ theo điều kiện, không chờ số vòng cố định
+        // (nếu không sẽ chập chờn khi máy bận).
+        await eventually(() => counts.isNotEmpty);
         expect(counts.last, {DefaultTagIds.study: 1});
 
         await repos.tags.delete(DefaultTagIds.study);
-        await pumpEventQueue();
+        await eventually(() => counts.last.isEmpty);
         expect(counts.last, isEmpty);
 
         await sub.cancel();
@@ -206,9 +208,9 @@ void main() {
       final sub = repos.tasks
           .watchSubtasks('a')
           .listen((list) => emitted.add(list.length));
-      await pumpEventQueue();
+      await eventually(() => emitted.isNotEmpty);
       await repos.tasks.delete('a');
-      await pumpEventQueue();
+      await eventually(() => emitted.length >= 2);
 
       expect(emitted, [1, 0]);
       await sub.cancel();
