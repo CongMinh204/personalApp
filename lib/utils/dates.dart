@@ -22,6 +22,17 @@ DateTimeRange monthRange(DateTime day) => DateTimeRange(
   end: DateTime(day.year, day.month + 1),
 );
 
+/// 00:00 ngày đầu tuần chứa [d]. [weekStart] theo `DateTime.weekday`: 1 =
+/// tuần bắt đầu từ Thứ Hai, 7 = từ Chủ Nhật (xem `week_start` trong Cài đặt).
+DateTime startOfWeek(DateTime d, int weekStart) {
+  final back = (d.weekday - weekStart + 7) % 7;
+  return DateTime(d.year, d.month, d.day - back);
+}
+
+/// Cả tuần chứa [day] (7 ngày, từ ngày đầu tuần).
+DateTimeRange weekRange(DateTime day, int weekStart) =>
+    daysRange(startOfWeek(day, weekStart), 7);
+
 /// [t] có nằm trong [range] không (gồm start, không gồm end).
 bool rangeContains(DateTimeRange range, DateTime t) =>
     !t.isBefore(range.start) && t.isBefore(range.end);

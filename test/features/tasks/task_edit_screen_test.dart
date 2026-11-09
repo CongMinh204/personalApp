@@ -106,7 +106,10 @@ void main() {
       await tester.tap(find.text('Cao'));
       await tester.tap(find.text('1 giờ'));
       await tester.tap(
-        find.widgetWithText(SegmentedButton<RepeatRule>, 'Tuần'),
+        find.descendant(
+          of: find.byType(SegmentedButton<RepeatRule>),
+          matching: find.text('Tuần'),
+        ),
       );
       await tester.pumpAndSettle();
       expect(find.text('Lặp mỗi Thứ Năm hằng tuần'), findsOneWidget);
@@ -198,7 +201,10 @@ void main() {
     ) async {
       await openAdd(tester);
       await tester.tap(
-        find.widgetWithText(SegmentedButton<RepeatRule>, 'Ngày'),
+        find.descendant(
+          of: find.byType(SegmentedButton<RepeatRule>),
+          matching: find.text('Ngày'),
+        ),
       );
       await tester.pumpAndSettle();
 
