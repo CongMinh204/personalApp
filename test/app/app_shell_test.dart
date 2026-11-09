@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:personal_app/app/dependencies.dart';
 import 'package:personal_app/app/settings_controller.dart';
 import 'package:personal_app/app/shell_controller.dart';
+import 'package:personal_app/features/timer/countdown_controller.dart';
 import 'package:personal_app/features/timer/timer_controller.dart';
 import 'package:personal_app/main.dart';
 import 'package:personal_app/theme/app_theme.dart';
@@ -83,7 +84,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(context.read<ShellController>().tab, HomeTab.timer);
-      expect(context.read<TimerController>().preparedTaskId, 'pe-flutter');
+      // Màn Hẹn giờ nhận việc được chọn sẵn rồi xóa khỏi hàng chờ.
+      expect(context.read<TimerController>().preparedTaskId, isNull);
+      expect(context.read<CountdownController>().taskId, 'pe-flutter');
       final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
       expect(bar.selectedIndex, HomeTab.timer.index);
     });

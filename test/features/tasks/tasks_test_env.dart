@@ -12,10 +12,14 @@ import 'package:personal_app/data/models/task.dart';
 import 'package:personal_app/data/repositories/focus_repository.dart';
 import 'package:personal_app/data/repositories/tag_repository.dart';
 import 'package:personal_app/data/repositories/task_repository.dart';
+import 'package:personal_app/features/timer/countdown_controller.dart';
+import 'package:personal_app/features/timer/stopwatch_controller.dart';
 import 'package:personal_app/features/timer/timer_controller.dart';
 import 'package:personal_app/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../timer/timer_test_helpers.dart';
 
 /// Giờ cố định dùng trong các test của việc: Thứ Năm 29/10/2026 13:40.
 final testNow = DateTime(2026, 10, 29, 13, 40);
@@ -35,6 +39,23 @@ class TasksEnv {
   late final tasks = FakeTaskRepository(store);
   late final tags = FakeTagRepository(store);
   late final focus = FakeFocusRepository(store);
+
+  /// Đồng hồ giả dùng chung cho đồng hồ đếm ngược và bấm giờ; tiến bằng tay.
+  late final clock = FakeClock(testNow);
+
+  late final countdown = CountdownController(
+    repository: focus,
+    settings: settings,
+    clock: clock.call,
+    autoTick: false,
+    makeId: () => 'phien-${_sessions++}',
+  );
+  late final stopwatch = StopwatchController(
+    clock: clock.call,
+    autoTick: false,
+  );
+  int _sessions = 0;
+  bool _disposed = false;
 
   /// [sample] = true thì có dữ liệu mẫu của app (tính theo [testNow]).
   static Future<TasksEnv> create({
@@ -61,6 +82,12 @@ class TasksEnv {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
+    addTearDown(() {
+      if (_disposed) return;
+      _disposed = true;
+      countdown.dispose();
+      stopwatch.dispose();
+    });
 
     await tester.pumpWidget(
       MultiProvider(
@@ -71,6 +98,8 @@ class TasksEnv {
           ChangeNotifierProvider<SettingsController>.value(value: settings),
           ChangeNotifierProvider<ShellController>.value(value: shell),
           ChangeNotifierProvider<TimerController>.value(value: timer),
+          ChangeNotifierProvider<CountdownController>.value(value: countdown),
+          ChangeNotifierProvider<StopwatchController>.value(value: stopwatch),
         ],
         child: MaterialApp(
           theme: AppTheme.light(),

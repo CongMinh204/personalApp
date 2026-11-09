@@ -10,6 +10,8 @@ import 'data/repositories/focus_repository.dart';
 import 'data/repositories/habit_repository.dart';
 import 'data/repositories/tag_repository.dart';
 import 'data/repositories/task_repository.dart';
+import 'features/timer/countdown_controller.dart';
+import 'features/timer/stopwatch_controller.dart';
 import 'features/timer/timer_controller.dart';
 import 'screens/home_shell.dart';
 import 'theme/app_theme.dart';
@@ -63,6 +65,18 @@ class _PersonalAppState extends State<PersonalApp> {
         ),
         ChangeNotifierProvider<ShellController>.value(value: _shell),
         ChangeNotifierProvider<TimerController>.value(value: _timer),
+        // Đồng hồ nằm ở cấp app để đổi tab vẫn chạy tiếp.
+        ChangeNotifierProvider<CountdownController>(
+          lazy: false,
+          create: (_) => CountdownController(
+            repository: deps.focus,
+            settings: widget.settings,
+          ),
+        ),
+        ChangeNotifierProvider<StopwatchController>(
+          lazy: false,
+          create: (_) => StopwatchController(),
+        ),
       ],
       // Đổi chủ đề hay màu nhấn trong Cài đặt thì dựng lại theme ngay.
       child: ListenableBuilder(
