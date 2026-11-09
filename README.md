@@ -2,7 +2,7 @@
 
 Ứng dụng todo cá nhân viết bằng Flutter, giao diện tiếng Việt, tối giản, bo góc lớn, màu nhấn xanh tím.
 
-Hiện có các màn **Hôm nay**, **Thêm/sửa việc**, **Chi tiết việc**, **Cài đặt** và **Quản lý nhãn**. Các tab Lịch, Hẹn giờ, Thống kê, Thói quen và màn Tìm kiếm đang hiện "Sắp có".
+Hiện có các màn **Hôm nay**, **Thêm/sửa việc**, **Chi tiết việc**, **Tìm kiếm**, **Cài đặt** và **Quản lý nhãn**. Các tab Lịch, Hẹn giờ, Thống kê và Thói quen đang hiện "Sắp có".
 
 ## Tính năng
 
@@ -17,6 +17,7 @@ Hiện có các màn **Hôm nay**, **Thêm/sửa việc**, **Chi tiết việc**
   - Bấm vào việc mở Chi tiết; nút "+" mở form Thêm việc.
 - Thêm/sửa việc: tiêu đề, ghi chú, ngày (hoặc không có ngày), cả ngày hoặc giờ bắt đầu–kết thúc, nhắc trước, lặp lại, ưu tiên, một nhãn (có thể tạo nhãn mới ngay trong form), việc con.
 - Chi tiết việc: thông tin, việc con, thời gian đã tập trung, nút Bắt đầu / Sửa / Xóa.
+- Tìm kiếm (biểu tượng ở header Hôm nay): tìm theo tiêu đề, ghi chú và tên nhãn (không phân biệt hoa thường và dấu tiếng Việt: gõ "hoc tap" vẫn ra "Học tập"), lọc Chưa xong / Đã xong / theo nhãn, "Tìm gần đây" (tối đa 5 từ khóa).
 - Cài đặt (bánh răng ở header Hôm nay): chủ đề sáng/tối/hệ thống, 5 màu nhấn, ngày đầu tuần, nhắc trước mặc định, Pomodoro và giờ nghỉ, xóa các việc đã hoàn thành. Quản lý nhãn (mở từ Cài đặt): thêm, sửa, xóa nhãn.
 - Tầng lưu trữ SQLite (sqflite) đã xong và có test; Android, iOS, macOS dùng SQLite, web và Windows dùng bản Fake trong bộ nhớ (`lib/app/dependencies.dart`). Trên Android database lúc đầu trống; bản Fake (web, Windows) có dữ liệu mẫu ở `lib/data/fake/sample_data.dart`.
 - Model, bảng và repository dùng chung của nhóm: [docs/DATA_CONTRACT.md](docs/DATA_CONTRACT.md).
@@ -106,6 +107,7 @@ app/shell_controller.dart  tab đang mở; app/routes.dart tên các màn không
 features/timer/            TimerController.prepare(taskId): chọn sẵn việc rồi mở tab Hẹn giờ
 features/today/            màn Hôm nay: today_screen, task_groups (groupTasks, nextTask)
 features/today/widgets/    task_tile, progress_card, empty_state
+features/search/           search_screen, recent_searches (tìm gần đây), search_filter
 features/tasks/            task_edit_screen, task_detail_screen, recurrence (việc lặp), task_form (kiểm tra form), task_actions
 features/settings/         settings_screen, tag_manager_screen, tag_validation (kiểm tra tên nhãn), widgets/
 ```

@@ -131,7 +131,7 @@ Từ bước 1, lấy repository qua Provider, ví dụ `context.read<TaskReposi
 | `watchByRange(range)` | Lịch tháng/tuần (chấm dưới ngày) | việc có `due` trong khoảng |
 | `getUnfinished()` | Nhắc việc (C) | việc chưa xong, để lên lịch lại thông báo khi mở app |
 | `getById(id)`, `watchById(id)` | Chi tiết, Sửa việc | trả `null` nếu không có |
-| `search(query)` | Tìm kiếm | tìm trong tiêu đề, ghi chú, tên nhãn; không phân biệt hoa thường; `query` rỗng → `[]`. Lọc Chưa xong/Đã xong/theo nhãn thì màn tự làm |
+| `search(query)` | Tìm kiếm | tìm trong tiêu đề, ghi chú, tên nhãn; không phân biệt hoa thường và dấu tiếng Việt ("hoc tap" ra "Học tập", chuẩn hóa bằng `foldVietnamese`); `query` rỗng → `[]`. Lọc Chưa xong/Đã xong/theo nhãn thì màn tự làm |
 | `countDoneByDay(range)` | Thống kê | số việc xong mỗi ngày, tính theo `completedAt`; có đủ mọi ngày trong khoảng, ngày không có việc = 0 |
 | `getCompletedInRange(range)` | Thống kê | việc có `completedAt` trong khoảng (để tính đúng hạn, thống kê theo nhãn) |
 | `add(task, subtasks:)` | Thêm việc, hoàn tác xóa | `taskId` của từng việc con phải bằng `task.id` |
@@ -201,7 +201,7 @@ Code nằm ở `lib/data/habit_streak.dart`, đã có test. E muốn đổi quy 
 - Xóa rồi hoàn tác: các phiên tập trung của việc đó đã chuyển thành "không gắn việc" và không được gắn lại.
 - Mỗi việc chỉ có một nhãn; bấm lại nhãn đang chọn để bỏ nhãn. Nhắc trước cũng bỏ được bằng cách bấm lại mức đang chọn (`reminderMinutes` = `null`).
 - Hoàn tác xóa: giữ lại task và việc con trước khi xóa, rồi gọi `add(task, subtasks: …)` với đúng các bản cũ.
-- "Tìm gần đây" B tự lưu bằng shared_preferences, key bắt đầu bằng `search_`.
+- "Tìm gần đây" lưu bằng shared_preferences, key `search_recent` (danh sách chuỗi, mới nhất trước, tối đa 5, không trùng không phân biệt hoa thường). Từ khóa được ghi nhớ khi nhấn Enter hoặc khi bấm vào một kết quả.
 
 **C (Lịch, nhắc việc, thống kê)**
 - id thông báo = `stableIntId(task.id)`. Khi mở app, lên lịch lại từ `getUnfinished()`.
@@ -270,3 +270,4 @@ Màn Tìm kiếm tự lưu "tìm gần đây" bằng key bắt đầu bằng `se
 | 1.1 | 09/11/2026 | Dự án chuyển sang một người làm; hợp đồng không đổi schema, vẫn là khung thiết kế cho bước 1 trở đi |
 | 1.2 | 09/11/2026 | Chốt mục 8 (cài đặt dùng chung) khi làm `SettingsController`: thêm 5 key (`reminders_enabled`, `morning_summary_enabled`, `short_break_minutes`, `long_break_minutes`, `auto_next_session`) và khoảng hợp lệ của từng key. Schema database không đổi |
 | 1.3 | 10/11/2026 | Bước 4: ghi thêm quy tắc việc lặp lại, hoàn tác xóa và chọn nhãn/nhắc trước ở mục 6 (B). Schema database không đổi |
+| 1.4 | 10/11/2026 | Màn Tìm kiếm: chốt key `search_recent` và quy tắc ghi nhớ từ khóa ở mục 6; `search` bỏ qua dấu tiếng Việt (trước đây chỉ bỏ qua hoa thường). Schema database không đổi |
