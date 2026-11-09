@@ -12,6 +12,10 @@ const _weekdays = [
 
 const _shortWeekdays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
+/// "Thứ Năm" cho [weekday] theo `DateTime.weekday` (1 = Thứ Hai … 7 = Chủ
+/// Nhật).
+String weekdayName(int weekday) => _weekdays[weekday - 1];
+
 String _two(int n) => n.toString().padLeft(2, '0');
 
 String _dayMonth(DateTime d) => '${_two(d.day)}/${_two(d.month)}';
@@ -26,6 +30,13 @@ int dayDiff(DateTime from, DateTime to) {
 /// "Thứ Năm, 29 tháng 10"
 String headerDate(DateTime d) =>
     '${_weekdays[d.weekday - 1]}, ${d.day} tháng ${d.month}';
+
+/// "Th 5, 29/10/2026" (như màn Thêm/sửa việc và Chi tiết việc).
+String fullDate(DateTime d) {
+  // Thứ Hai (weekday 1) gọi là "Th 2", Chủ Nhật (weekday 7) là "CN".
+  final weekday = d.weekday == 7 ? 'CN' : 'Th ${d.weekday + 1}';
+  return '$weekday, ${_dayMonth(d)}/${d.year}';
+}
 
 /// "14:05"
 String hourMinute(DateTime d) => '${_two(d.hour)}:${_two(d.minute)}';

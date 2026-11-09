@@ -20,12 +20,18 @@ class DbChanges {
   /// Stream phát kết quả của [read] ngay khi được lắng nghe, rồi phát lại sau
   /// mỗi lần ghi. Các lần đọc chạy lần lượt, kết quả không bị đảo thứ tự: nếu
   /// có ghi khi đang đọc thì đọc lại thêm một lần sau đó.
+  ///
+  /// Luồng này nghe lại được sau khi đã hủy (mỗi lần nghe lại đọc lại từ đầu).
+  /// Điều này cần thiết vì một widget nằm trong danh sách cuộn bị hủy rồi tạo
+  /// lại khi cuộn ra và vào màn hình, và nó nghe lại cùng một luồng. Không dùng
+  /// chung một luồng cho nhiều người nghe cùng lúc: chỉ người nghe đầu tiên
+  /// nhận được giá trị khởi đầu.
   Stream<T> watch<T>(Future<T> Function() read) {
     late final StreamController<T> controller;
     StreamSubscription<void>? subscription;
     var running = false;
     var dirty = false;
-    var cancelled = false;
+    var active = false;
 
     Future<void> load() async {
       if (running) {
@@ -37,23 +43,25 @@ class DbChanges {
         do {
           dirty = false;
           final value = await read();
-          if (!cancelled) controller.add(value);
-        } while (dirty && !cancelled);
+          if (active) controller.add(value);
+        } while (dirty && active);
       } catch (error, stack) {
-        if (!cancelled) controller.addError(error, stack);
+        if (active) controller.addError(error, stack);
       } finally {
         running = false;
       }
     }
 
-    controller = StreamController<T>(
+    controller = StreamController<T>.broadcast(
       onListen: () {
+        active = true;
         subscription = _controller.stream.listen((_) => load());
         load();
       },
       onCancel: () {
-        cancelled = true;
-        return subscription?.cancel();
+        active = false;
+        subscription?.cancel();
+        subscription = null;
       },
     );
     return controller.stream;

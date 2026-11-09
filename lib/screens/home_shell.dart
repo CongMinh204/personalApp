@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app/shell_controller.dart';
-import '../data/default_tags.dart';
-import '../data/fake/sample_data.dart';
 import '../features/today/today_screen.dart';
 
 /// Khung 5 tab. Tab đang mở do [ShellController] giữ để màn nào cũng chuyển
@@ -16,8 +14,6 @@ class HomeShell extends StatefulWidget {
 }
 
 class _HomeShellState extends State<HomeShell> {
-  final _initialTasks = sampleTasks(DateTime.now());
-
   @override
   Widget build(BuildContext context) {
     final shell = context.watch<ShellController>();
@@ -25,7 +21,7 @@ class _HomeShellState extends State<HomeShell> {
       body: IndexedStack(
         index: shell.tab.index,
         children: [
-          TodayScreen(initialTasks: _initialTasks, tags: defaultTags),
+          const TodayScreen(),
           const _ComingSoon(title: 'Lịch', icon: Icons.calendar_month_rounded),
           const _ComingSoon(title: 'Hẹn giờ', icon: Icons.timer_outlined),
           const _ComingSoon(title: 'Thống kê', icon: Icons.insights_rounded),

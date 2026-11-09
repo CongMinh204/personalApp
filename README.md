@@ -2,18 +2,23 @@
 
 Ứng dụng todo cá nhân viết bằng Flutter, giao diện tiếng Việt, tối giản, bo góc lớn, màu nhấn xanh tím.
 
-Hiện có các màn **Hôm nay**, **Cài đặt** và **Quản lý nhãn**. Các tab Lịch, Hẹn giờ, Thống kê, Thói quen và các màn con khác (Tìm kiếm, Chi tiết việc...) đang hiện "Sắp có".
+Hiện có các màn **Hôm nay**, **Thêm/sửa việc**, **Chi tiết việc**, **Cài đặt** và **Quản lý nhãn**. Các tab Lịch, Hẹn giờ, Thống kê, Thói quen và màn Tìm kiếm đang hiện "Sắp có".
 
 ## Tính năng
 
 - Thanh tab dưới cùng 5 mục: Hôm nay, Lịch, Hẹn giờ, Thống kê, Thói quen. Cài đặt mở từ biểu tượng bánh răng ở header Hôm nay; chủ đề sáng/tối và màu nhấn lưu trong cài đặt (mặc định theo hệ thống).
-- Màn Hôm nay:
-  - Lọc theo nhãn: Học tập, Công việc, Cá nhân, Sức khỏe.
+- Màn Hôm nay (đọc và ghi qua `TaskRepository`, nhãn lấy từ `TagRepository`):
+  - Lọc theo nhãn (nhãn thêm ở Quản lý nhãn hiện ra ngay).
   - Thẻ tiến độ trong ngày, thẻ "Xong hết việc hôm nay!" và màn trống.
   - Ba nhóm việc: Quá hạn, Hôm nay, Sắp tới.
-  - Bấm checkbox để hoàn thành, vuốt trái để xóa (có "Hoàn tác").
-  - Nút "+" mở form thêm nhanh: tên việc, nhãn, ưu tiên, giờ.
-- Tầng lưu trữ SQLite (sqflite) đã xong và có test; Android, iOS, macOS dùng SQLite, web và Windows dùng bản Fake trong bộ nhớ (`lib/app/dependencies.dart`). Các màn chưa nối vào repository nên màn Hôm nay vẫn hiện dữ liệu mẫu ở `lib/data/fake/sample_data.dart`.
+  - Bấm checkbox để hoàn thành, vuốt trái để xóa (có "Hoàn tác", khôi phục cả việc con).
+  - Việc có lặp lại: hoàn thành thì tự tạo việc cho lần kế tiếp.
+  - Nút đồng hồ trên mỗi việc chưa xong mở tab Hẹn giờ với việc đó chọn sẵn.
+  - Bấm vào việc mở Chi tiết; nút "+" mở form Thêm việc.
+- Thêm/sửa việc: tiêu đề, ghi chú, ngày (hoặc không có ngày), cả ngày hoặc giờ bắt đầu–kết thúc, nhắc trước, lặp lại, ưu tiên, một nhãn (có thể tạo nhãn mới ngay trong form), việc con.
+- Chi tiết việc: thông tin, việc con, thời gian đã tập trung, nút Bắt đầu / Sửa / Xóa.
+- Cài đặt (bánh răng ở header Hôm nay): chủ đề sáng/tối/hệ thống, 5 màu nhấn, ngày đầu tuần, nhắc trước mặc định, Pomodoro và giờ nghỉ, xóa các việc đã hoàn thành. Quản lý nhãn (mở từ Cài đặt): thêm, sửa, xóa nhãn.
+- Tầng lưu trữ SQLite (sqflite) đã xong và có test; Android, iOS, macOS dùng SQLite, web và Windows dùng bản Fake trong bộ nhớ (`lib/app/dependencies.dart`). Trên Android database lúc đầu trống; bản Fake (web, Windows) có dữ liệu mẫu ở `lib/data/fake/sample_data.dart`.
 - Model, bảng và repository dùng chung của nhóm: [docs/DATA_CONTRACT.md](docs/DATA_CONTRACT.md).
 
 ## Hướng dẫn chạy dự án
@@ -100,6 +105,7 @@ app/settings_controller.dart  cài đặt lưu bằng shared_preferences (key: d
 app/shell_controller.dart  tab đang mở; app/routes.dart tên các màn không phải tab
 features/timer/            TimerController.prepare(taskId): chọn sẵn việc rồi mở tab Hẹn giờ
 features/today/            màn Hôm nay: today_screen, task_groups (groupTasks, nextTask)
-features/today/widgets/    task_tile, progress_card, empty_state, quick_add_sheet
+features/today/widgets/    task_tile, progress_card, empty_state
+features/tasks/            task_edit_screen, task_detail_screen, recurrence (việc lặp), task_form (kiểm tra form), task_actions
 features/settings/         settings_screen, tag_manager_screen, tag_validation (kiểm tra tên nhãn), widgets/
 ```

@@ -119,16 +119,7 @@ class SettingsScreen extends StatelessWidget {
           SettingsSection(
             title: 'Dữ liệu',
             children: [
-              StreamBuilder<List<Tag>>(
-                stream: context.read<TagRepository>().watchAll(),
-                builder: (context, snapshot) => SettingsRow(
-                  title: 'Quản lý nhãn',
-                  value: '${snapshot.data?.length ?? 0} nhãn',
-                  showChevron: true,
-                  onTap: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.tagManager),
-                ),
-              ),
+              const _TagManagerRow(),
               SettingsRow(
                 title: 'Xóa các việc đã hoàn thành',
                 destructive: true,
@@ -290,5 +281,31 @@ class SettingsScreen extends StatelessWidget {
     messenger
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text('Đã xóa $deleted việc')));
+  }
+}
+
+/// Dòng "Quản lý nhãn" kèm số nhãn. Giữ luồng nhãn trong State để không tạo lại
+/// mỗi lần màn Cài đặt dựng lại (nếu không số nhãn nhấp nháy về 0).
+class _TagManagerRow extends StatefulWidget {
+  const _TagManagerRow();
+
+  @override
+  State<_TagManagerRow> createState() => _TagManagerRowState();
+}
+
+class _TagManagerRowState extends State<_TagManagerRow> {
+  late final Stream<List<Tag>> _tags = context.read<TagRepository>().watchAll();
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<Tag>>(
+      stream: _tags,
+      builder: (context, snapshot) => SettingsRow(
+        title: 'Quản lý nhãn',
+        value: '${snapshot.data?.length ?? 0} nhãn',
+        showChevron: true,
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.tagManager),
+      ),
+    );
   }
 }

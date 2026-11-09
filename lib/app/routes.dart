@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../features/settings/settings_screen.dart';
 import '../features/settings/tag_manager_screen.dart';
+import '../features/tasks/task_detail_screen.dart';
+import '../features/tasks/task_edit_screen.dart';
 
 /// Tên và cách mở các màn không phải tab. Màn nào cũng mở bằng
 /// `Navigator.pushNamed(context, AppRoutes.xxx)`, không tự import màn khác.
@@ -52,7 +54,22 @@ abstract final class AppRoutes {
   static final _builders = <String, WidgetBuilder>{
     settings: (_) => const SettingsScreen(),
     tagManager: (_) => const TagManagerScreen(),
+    taskDetail: (context) =>
+        TaskDetailScreen(taskId: _argument<String>(context)!),
+    taskEdit: (context) {
+      // Tham số là id việc (sửa) hoặc ngày điền sẵn (thêm), hoặc không có.
+      final argument = ModalRoute.of(context)?.settings.arguments;
+      return TaskEditScreen(
+        taskId: argument is String ? argument : null,
+        initialDate: argument is DateTime ? argument : null,
+      );
+    },
   };
+
+  static T? _argument<T>(BuildContext context) {
+    final argument = ModalRoute.of(context)?.settings.arguments;
+    return argument is T ? argument : null;
+  }
 
   /// Dùng cho `MaterialApp.onGenerateRoute`.
   static Route<dynamic>? onGenerateRoute(RouteSettings route) {
@@ -60,7 +77,7 @@ abstract final class AppRoutes {
     if (title == null) return null;
     final builder =
         _builders[route.name] ?? (_) => ComingSoonPage(title: title);
-    return MaterialPageRoute<void>(builder: builder, settings: route);
+    return MaterialPageRoute<Object?>(builder: builder, settings: route);
   }
 }
 

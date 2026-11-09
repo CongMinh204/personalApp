@@ -1,27 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../app/routes.dart';
 import '../../data/models/tag.dart';
 import '../../data/models/task.dart';
+import '../../data/repositories/tag_repository.dart';
+import '../../data/repositories/task_repository.dart';
 import '../../utils/vi_date.dart';
+import '../tasks/task_actions.dart';
+import '../timer/timer_controller.dart';
 import 'task_groups.dart';
 import 'widgets/empty_state.dart';
 import 'widgets/progress_card.dart';
-import 'widgets/quick_add_sheet.dart';
 import 'widgets/task_tile.dart';
 
 class TodayScreen extends StatefulWidget {
-  const TodayScreen({
-    super.key,
-    required this.initialTasks,
-    this.tags = const [],
-    this.clock = DateTime.now,
-  });
-
-  final List<Task> initialTasks;
-
-  /// Nhãn để lọc, hiện badge và chọn khi thêm nhanh.
-  final List<Tag> tags;
+  const TodayScreen({super.key, this.clock = DateTime.now});
 
   /// Nguồn thời gian hiện tại; thay bằng giờ cố định khi test.
   final DateTime Function() clock;
@@ -33,147 +27,174 @@ class TodayScreen extends StatefulWidget {
 class _TodayScreenState extends State<TodayScreen> {
   // Messenger riêng để SnackBar hiện trong Scaffold này và đẩy FAB lên.
   final _messengerKey = GlobalKey<ScaffoldMessengerState>();
-  late final List<Task> _tasks = List.of(widget.initialTasks);
+
+  late final TaskRepository _repo = context.read<TaskRepository>();
+  late final TaskActions _actions = TaskActions(_repo, clock: widget.clock);
+  late final Stream<List<Task>> _tasks = _repo.watchAll();
+  late final Stream<List<Tag>> _tags = context.read<TagRepository>().watchAll();
+
   String? _filterTagId;
 
-  void _toggleDone(Task task) {
-    final index = _tasks.indexWhere((t) => t.id == task.id);
-    if (index < 0) return;
-    setState(() => _tasks[index] = task.copyWith(done: !task.done));
-  }
+  // Việc vừa vuốt xóa nhưng stream chưa phát lại danh sách mới: ẩn ngay để
+  // Dismissible không còn nằm trong cây widget (nếu không Flutter báo lỗi).
+  final _hidden = <String>{};
 
-  void _delete(Task task) {
-    final index = _tasks.indexWhere((t) => t.id == task.id);
-    if (index < 0) return;
-    setState(() => _tasks.removeAt(index));
+  void _showMessage(String text, {SnackBarAction? action}) {
     _messengerKey.currentState!
       ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text('Đã xóa "${task.title}"'),
-          persist: false,
-          action: SnackBarAction(
-            label: 'Hoàn tác',
-            onPressed: () => setState(
-              () => _tasks.insert(index.clamp(0, _tasks.length), task),
-            ),
-          ),
-        ),
-      );
+      ..showSnackBar(SnackBar(content: Text(text), action: action));
   }
 
-  Future<void> _openQuickAdd() async {
-    final task = await showQuickAddSheet(
-      context,
-      now: widget.clock(),
-      tags: widget.tags,
+  Future<void> _toggleDone(Task task) async {
+    final next = await _actions.toggleDone(task);
+    if (next != null && mounted) {
+      _showMessage(
+        'Đã tạo việc lặp kế tiếp (${taskTimeLabel(next, widget.clock())})',
+      );
+    }
+  }
+
+  Future<void> _delete(Task task) async {
+    setState(() => _hidden.add(task.id));
+    final deleted = await _actions.delete(task);
+    if (!mounted) return;
+    _showMessage(
+      'Đã xóa "${task.title}"',
+      action: SnackBarAction(
+        label: 'Hoàn tác',
+        onPressed: () async {
+          await _actions.undoDelete(deleted);
+          if (mounted) setState(() => _hidden.remove(task.id));
+        },
+      ),
     );
-    if (task == null || !mounted) return;
-    setState(() => _tasks.add(task));
   }
 
-  void _showSearchSoon() {
-    _messengerKey.currentState!
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(content: Text('Tìm kiếm sẽ có trong bản sau')),
-      );
-  }
+  void _openAdd() => Navigator.of(context).pushNamed(AppRoutes.taskEdit);
+
+  void _openDetail(Task task) =>
+      Navigator.of(context).pushNamed(AppRoutes.taskDetail, arguments: task.id);
 
   @override
   Widget build(BuildContext context) {
+    return ScaffoldMessenger(
+      key: _messengerKey,
+      child: StreamBuilder<List<Tag>>(
+        stream: _tags,
+        builder: (context, tagsSnapshot) => StreamBuilder<List<Task>>(
+          stream: _tasks,
+          builder: (context, tasksSnapshot) {
+            if (!tagsSnapshot.hasData || !tasksSnapshot.hasData) {
+              // Chưa đọc xong database: không hiện màn trống một cách sai.
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            return _scaffold(context, tasksSnapshot.data!, tagsSnapshot.data!);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _scaffold(BuildContext context, List<Task> stored, List<Tag> tags) {
     final now = widget.clock();
-    final tagById = {for (final tag in widget.tags) tag.id: tag};
-    final all = groupTasks(_tasks, now);
+    // Bỏ khỏi _hidden những việc đã thật sự biến mất khỏi database.
+    _hidden.removeWhere((id) => !stored.any((t) => t.id == id));
+    final tasks = [
+      for (final t in stored)
+        if (!_hidden.contains(t.id)) t,
+    ];
+    final tagById = {for (final tag in tags) tag.id: tag};
+    final all = groupTasks(tasks, now);
+    // Nhãn đang lọc đã bị xóa thì quay về Tất cả.
     final filter = tagById[_filterTagId];
     final groups = filter == null
         ? all
-        : groupTasks(_tasks.where((t) => t.tagId == filter.id).toList(), now);
+        : groupTasks(tasks.where((t) => t.tagId == filter.id).toList(), now);
     final scheme = Theme.of(context).colorScheme;
 
-    return ScaffoldMessenger(
-      key: _messengerKey,
-      child: Scaffold(
-        floatingActionButton: all.isTodayEmpty
-            ? null
-            : FloatingActionButton(
-                tooltip: 'Thêm việc',
-                onPressed: _openQuickAdd,
-                child: const Icon(Icons.add_rounded, size: 28),
+    return Scaffold(
+      floatingActionButton: all.isTodayEmpty
+          ? null
+          : FloatingActionButton(
+              tooltip: 'Thêm việc',
+              onPressed: _openAdd,
+              child: const Icon(Icons.add_rounded, size: 28),
+            ),
+      body: SafeArea(
+        bottom: false,
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: _Header(
+                now: now,
+                onSearch: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.search),
+                onOpenSettings: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.settings),
               ),
-        body: SafeArea(
-          bottom: false,
-          child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: _Header(
-                  now: now,
-                  onSearch: _showSearchSoon,
-                  onOpenSettings: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.settings),
-                ),
+            ),
+            SliverToBoxAdapter(
+              child: _TagFilter(
+                tags: tags,
+                selected: filter?.id,
+                onSelected: (id) => setState(() => _filterTagId = id),
               ),
-              SliverToBoxAdapter(
-                child: _TagFilter(
-                  tags: widget.tags,
-                  selected: filter?.id,
-                  onSelected: (id) => setState(() => _filterTagId = id),
-                ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+              sliver: SliverToBoxAdapter(
+                child: all.isTodayEmpty
+                    ? EmptyState(onAdd: _openAdd)
+                    : all.isAllDone
+                    ? AllDoneCard(total: all.today.length)
+                    : ProgressCard(
+                        done: all.todayDone,
+                        total: all.today.length,
+                        next: nextTask(all.today, now),
+                      ),
               ),
+            ),
+            if (groups.overdue.isNotEmpty)
+              ..._section(
+                title: 'Quá hạn · ${groups.overdue.length}',
+                color: scheme.error,
+                tasks: groups.overdue,
+                tagById: tagById,
+                now: now,
+                overdue: true,
+              ),
+            if (groups.today.isNotEmpty)
+              ..._section(
+                title: 'Hôm nay · ${groups.today.length}',
+                tasks: groups.today,
+                tagById: tagById,
+                now: now,
+              ),
+            if (groups.upcoming.isNotEmpty)
+              ..._section(
+                title: 'Sắp tới',
+                tasks: groups.upcoming,
+                tagById: tagById,
+                now: now,
+              ),
+            if (filter != null &&
+                groups.overdue.isEmpty &&
+                groups.today.isEmpty &&
+                groups.upcoming.isEmpty)
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
                 sliver: SliverToBoxAdapter(
-                  child: all.isTodayEmpty
-                      ? EmptyState(onAdd: _openQuickAdd)
-                      : all.isAllDone
-                      ? AllDoneCard(total: all.today.length)
-                      : ProgressCard(
-                          done: all.todayDone,
-                          total: all.today.length,
-                          next: nextTask(all.today, now),
-                        ),
-                ),
-              ),
-              if (groups.overdue.isNotEmpty)
-                ..._section(
-                  title: 'Quá hạn · ${groups.overdue.length}',
-                  color: scheme.error,
-                  tasks: groups.overdue,
-                  tagById: tagById,
-                  now: now,
-                  overdue: true,
-                ),
-              if (groups.today.isNotEmpty)
-                ..._section(
-                  title: 'Hôm nay · ${groups.today.length}',
-                  tasks: groups.today,
-                  tagById: tagById,
-                  now: now,
-                ),
-              if (groups.upcoming.isNotEmpty)
-                ..._section(
-                  title: 'Sắp tới',
-                  tasks: groups.upcoming,
-                  tagById: tagById,
-                  now: now,
-                ),
-              if (filter != null &&
-                  groups.overdue.isEmpty &&
-                  groups.today.isEmpty &&
-                  groups.upcoming.isEmpty)
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
-                  sliver: SliverToBoxAdapter(
-                    child: Text(
-                      'Chưa có việc nào với nhãn "${filter.name}"',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: scheme.onSurfaceVariant),
-                    ),
+                  child: Text(
+                    'Chưa có việc nào với nhãn "${filter.name}"',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: scheme.onSurfaceVariant),
                   ),
                 ),
-              const SliverToBoxAdapter(child: SizedBox(height: 96)),
-            ],
-          ),
+              ),
+            const SliverToBoxAdapter(child: SizedBox(height: 96)),
+          ],
         ),
       ),
     );
@@ -209,6 +230,8 @@ class _TodayScreenState extends State<TodayScreen> {
                 now: now,
                 overdue: overdue,
                 onToggle: () => _toggleDone(task),
+                onTap: () => _openDetail(task),
+                onTimer: () => context.read<TimerController>().prepare(task.id),
               ),
             );
           },
