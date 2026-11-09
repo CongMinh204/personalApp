@@ -13,7 +13,7 @@ Hiện mới có màn **Hôm nay**. Các tab Lịch, Hẹn giờ, Thống kê, C
   - Ba nhóm việc: Quá hạn, Hôm nay, Sắp tới.
   - Bấm checkbox để hoàn thành, vuốt trái để xóa (có "Hoàn tác").
   - Nút "+" mở form thêm nhanh: tên việc, nhãn, ưu tiên, giờ.
-- Dữ liệu hiện chỉ nằm trong bộ nhớ (dữ liệu mẫu ở `lib/data/fake/sample_data.dart`). Tắt app là mất thay đổi.
+- Tầng lưu trữ SQLite (sqflite) đã xong và có test; Android, iOS, macOS dùng SQLite, web và Windows dùng bản Fake trong bộ nhớ (`lib/app/dependencies.dart`). Các màn chưa nối vào repository nên màn Hôm nay vẫn hiện dữ liệu mẫu ở `lib/data/fake/sample_data.dart`.
 - Model, bảng và repository dùng chung của nhóm: [docs/DATA_CONTRACT.md](docs/DATA_CONTRACT.md).
 
 ## Hướng dẫn chạy dự án
@@ -92,6 +92,8 @@ theme/app_theme.dart       màu, theme sáng/tối, TaskColors
 data/models/               Task, Subtask, Tag, FocusSession, Habit, HabitLog
 data/repositories/         interface repository (xem docs/DATA_CONTRACT.md)
 data/fake/                 bản Fake trong bộ nhớ và dữ liệu mẫu
+data/sqlite/               AppDatabase (6 bảng, khóa ngoại, index) và 4 repository SQLite
+app/dependencies.dart      chỗ duy nhất chọn SQLite hay Fake; main.dart đưa xuống bằng Provider
 utils/                     vi_date (ngày giờ tiếng Việt), dates (khoảng ngày) — dùng chung
 screens/home_shell.dart    khung 5 tab
 features/today/            màn Hôm nay: today_screen, task_groups (groupTasks, nextTask)
