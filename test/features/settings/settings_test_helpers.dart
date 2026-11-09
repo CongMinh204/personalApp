@@ -41,9 +41,13 @@ class SettingsTestEnv {
   }
 
   /// Dựng [screen] làm màn đầu tiên của một app có đủ Provider và routes.
-  Future<void> pump(WidgetTester tester, Widget screen) async {
-    // Màn hình cỡ điện thoại (390x844).
-    tester.view.physicalSize = const Size(1170, 2532);
+  Future<void> pump(
+    WidgetTester tester,
+    Widget screen, {
+    Size size = const Size(1170, 2532),
+  }) async {
+    // Mặc định màn hình cỡ điện thoại (390x844).
+    tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 

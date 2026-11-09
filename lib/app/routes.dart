@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../features/settings/settings_screen.dart';
+import '../features/settings/tag_manager_screen.dart';
+
 /// Tên và cách mở các màn không phải tab. Màn nào cũng mở bằng
 /// `Navigator.pushNamed(context, AppRoutes.xxx)`, không tự import màn khác.
 ///
@@ -46,7 +49,10 @@ abstract final class AppRoutes {
   };
 
   /// Màn thật của từng route, thêm vào khi màn được làm xong.
-  static final _builders = <String, WidgetBuilder>{};
+  static final _builders = <String, WidgetBuilder>{
+    settings: (_) => const SettingsScreen(),
+    tagManager: (_) => const TagManagerScreen(),
+  };
 
   /// Dùng cho `MaterialApp.onGenerateRoute`.
   static Route<dynamic>? onGenerateRoute(RouteSettings route) {
