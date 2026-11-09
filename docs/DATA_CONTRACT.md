@@ -224,8 +224,11 @@ Code nằm ở `lib/data/habit_streak.dart`, đã có test. E muốn đổi quy 
 
 **E (Thói quen)**
 - `icon` là khóa chữ, `color` là `Color`.
-- Nút "+1" gọi `increment`; tích xong gọi `setCount(habitId, ngày, habit.goalPerDay)`.
-- Lưu trữ/khôi phục bằng `setArchived`; xóa hẳn bằng `delete` (màn tự hỏi xác nhận).
+- Chấm trong ngày: mục tiêu 1 lần thì bấm là xong (`setCount` bằng `goalPerDay`) và bấm lại là bỏ xong (`setCount` bằng 0); mục tiêu nhiều lần thì mỗi lần bấm cộng 1 (`setCount` bằng số lần hiện tại + 1) đến đủ, khi đã đủ bấm lại thì về 0. Không có nút trừ 1.
+- Thói quen không có lịch hôm nay (thứ không nằm trong `repeatDays`, hoặc chưa tới `startDate`) hiện mờ ở cuối danh sách, nút chấm bị tắt, và không tính vào "Thói quen hôm nay x/y".
+- Form Thêm/sửa: tên không được trống; phải chọn ít nhất một thứ; mục tiêu mỗi ngày từ 1 đến 99 lần; `unit` chỉ có nghĩa khi mục tiêu lớn hơn 1 (đưa mục tiêu về 1 thì `unit` bị bỏ); ngày bắt đầu là hôm nay hoặc quá khứ; `reminderTime` mặc định tắt, bật thì mặc định 20:00 (chỉ lưu giá trị, thông báo làm ở bước thông báo). `update` không đổi `archivedAt`.
+- Lưu trữ/khôi phục bằng `setArchived` (lưu trữ không hỏi, có Hoàn tác; lịch sử và chuỗi ngày vẫn giữ). Xóa hẳn bằng `delete` có hộp xác nhận và xóa luôn toàn bộ nhật ký.
+- Màn Đã lưu trữ ghi "Chuỗi dài nhất N ngày" (`bestStreakOf`) và ngày `archivedAt`.
 
 ## 7. Bản Fake và dữ liệu mẫu
 
@@ -279,3 +282,4 @@ Màn Tìm kiếm tự lưu "tìm gần đây" bằng key bắt đầu bằng `se
 | 1.4 | 10/11/2026 | Màn Tìm kiếm: chốt key `search_recent` và quy tắc ghi nhớ từ khóa ở mục 6; `search` bỏ qua dấu tiếng Việt (trước đây chỉ bỏ qua hoa thường). Schema database không đổi |
 | 1.5 | 10/11/2026 | Bước 5 (Hẹn giờ): chốt ở mục 6 (D) quy tắc phiên hoàn thành và bỏ dở, ngưỡng lưu 10 giây, phiên nghỉ không gắn việc và không hiện trong lịch sử, bấm giờ không lưu. Schema database không đổi |
 | 1.6 | 10/11/2026 | Màn Lịch sử tập trung: chốt ở mục 6 (D) ý nghĩa ba tab, khoảng hiển thị, các ô tóm tắt và cách xóa/hoàn tác. Schema database không đổi |
+| 1.7 | 10/11/2026 | Bước 6a (Thói quen): chốt ở mục 6 (E) cách chấm trong ngày, thói quen không có lịch hôm nay, luật form Thêm/sửa, lưu trữ và xóa hẳn. Schema database không đổi |

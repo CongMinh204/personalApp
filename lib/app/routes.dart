@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../features/focus_history/focus_history_screen.dart';
+import '../features/habits/habit_archived_screen.dart';
+import '../features/habits/habit_edit_screen.dart';
 import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/settings/tag_manager_screen.dart';
@@ -58,6 +60,12 @@ abstract final class AppRoutes {
     tagManager: (_) => const TagManagerScreen(),
     search: (_) => const SearchScreen(),
     focusHistory: (_) => const FocusHistoryScreen(),
+    habitEdit: (context) {
+      // Tham số là id thói quen (sửa) hoặc không có (thêm).
+      final argument = ModalRoute.of(context)?.settings.arguments;
+      return HabitEditScreen(habitId: argument is String ? argument : null);
+    },
+    habitArchived: (_) => const HabitArchivedScreen(),
     taskDetail: (context) =>
         TaskDetailScreen(taskId: _argument<String>(context)!),
     taskEdit: (context) {
