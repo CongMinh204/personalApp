@@ -91,6 +91,31 @@ void runRepositoryContract(
         await sub.cancel();
       });
 
+      test(
+        'luồng watch nghe lại được sau khi hủy (widget bị tạo lại)',
+        () async {
+          // Widget trong danh sách cuộn bị hủy rồi tạo lại khi cuộn ra và vào
+          // màn hình, và nghe lại đúng luồng cũ.
+          final stream = repos.tasks.watchAll();
+          final first = await stream.first; // nghe rồi hủy sau giá trị đầu
+          await repos.tasks.add(task('a'));
+          final second = await stream.first; // nghe lại cùng luồng
+
+          expect(first, isEmpty);
+          expect([for (final t in second) t.id], ['a']);
+        },
+      );
+
+      test('luồng nhãn và thói quen cũng nghe lại được sau khi hủy', () async {
+        final tags = repos.tags.watchAll();
+        expect(await tags.first, hasLength(4));
+        expect(await tags.first, hasLength(4));
+
+        final habits = repos.habits.watchActive();
+        expect(await habits.first, isEmpty);
+        expect(await habits.first, isEmpty);
+      });
+
       test('setDone đặt completedAt theo đồng hồ, bỏ xong thì xóa', () async {
         await repos.tasks.add(task('a'));
         await repos.tasks.setDone('a', true);

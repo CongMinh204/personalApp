@@ -63,16 +63,20 @@ class FakeStore {
   void notifyChanged() => _changes.add(null);
 
   /// Stream phát kết quả của [read] ngay khi được lắng nghe, rồi phát lại sau
-  /// mỗi lần ghi.
+  /// mỗi lần ghi. Nghe lại được sau khi đã hủy (như bản SQLite), vì widget
+  /// trong danh sách cuộn bị tạo lại và nghe lại cùng một luồng.
   Stream<T> watch<T>(T Function() read) {
     late final StreamController<T> controller;
     StreamSubscription<void>? subscription;
-    controller = StreamController<T>(
+    controller = StreamController<T>.broadcast(
       onListen: () {
         controller.add(read());
         subscription = _changes.stream.listen((_) => controller.add(read()));
       },
-      onCancel: () => subscription?.cancel(),
+      onCancel: () {
+        subscription?.cancel();
+        subscription = null;
+      },
     );
     return controller.stream;
   }
