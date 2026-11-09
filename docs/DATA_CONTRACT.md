@@ -252,3 +252,4 @@ Lưu bằng shared_preferences, đọc qua `SettingsController` (làm ở bướ
 | Bản | Ngày | Nội dung |
 |---|---|---|
 | 1 | 07/11/2026 | Bản đầu, chờ nhóm duyệt |
+| 1.1 | 09/11/2026 | Dự án chuyển sang một người làm; hợp đồng không đổi schema, vẫn là khung thiết kế cho bước 1 trở đi |
