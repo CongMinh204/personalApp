@@ -220,6 +220,7 @@ Code nằm ở `lib/data/habit_streak.dart`, đã có test. E muốn đổi quy 
 - Chu kỳ Pomodoro: 4 phiên tập trung (`pomodoro`) xen nghỉ ngắn, sau phiên thứ 4 là nghỉ dài, rồi chu kỳ bắt đầu lại. Chế độ Tùy chỉnh (`custom`, 1–180 phút) đứng ngoài chu kỳ.
 - **Bấm giờ (stopwatch) không lưu** vào lịch sử (hợp đồng không có loại phiên cho nó); các vòng chỉ để đo.
 - Đồng hồ không được khôi phục nếu tắt hẳn app khi đang chạy (phiên đang chạy bị mất, không lưu).
+- Lịch sử tập trung: ba tab Ngày / Tuần / Tháng chỉ đổi **cách gom nhóm** (theo `startedAt`; tuần theo `week_start` trong Cài đặt) và hiện 30 ngày, 12 tuần hoặc 12 tháng gần nhất. Chỉ hiện và chỉ tính phiên tập trung (`type.isFocus`). Hai ô tóm tắt đầu (Phiên, Hoàn thành x/y) tính cho kỳ hiện tại của tab (hôm nay, tuần này, tháng này); ô thứ ba là tổng thời gian tập trung của kỳ lớn hơn (Tuần này, Tháng này, Năm nay). Tổng thời gian tính cả phiên bỏ dở. Xóa một phiên dùng `delete(id)`; hoàn tác thêm lại phiên, nếu việc của phiên đã bị xóa thì khôi phục ở dạng không gắn việc.
 
 **E (Thói quen)**
 - `icon` là khóa chữ, `color` là `Color`.
@@ -277,3 +278,4 @@ Màn Tìm kiếm tự lưu "tìm gần đây" bằng key bắt đầu bằng `se
 | 1.3 | 10/11/2026 | Bước 4: ghi thêm quy tắc việc lặp lại, hoàn tác xóa và chọn nhãn/nhắc trước ở mục 6 (B). Schema database không đổi |
 | 1.4 | 10/11/2026 | Màn Tìm kiếm: chốt key `search_recent` và quy tắc ghi nhớ từ khóa ở mục 6; `search` bỏ qua dấu tiếng Việt (trước đây chỉ bỏ qua hoa thường). Schema database không đổi |
 | 1.5 | 10/11/2026 | Bước 5 (Hẹn giờ): chốt ở mục 6 (D) quy tắc phiên hoàn thành và bỏ dở, ngưỡng lưu 10 giây, phiên nghỉ không gắn việc và không hiện trong lịch sử, bấm giờ không lưu. Schema database không đổi |
+| 1.6 | 10/11/2026 | Màn Lịch sử tập trung: chốt ở mục 6 (D) ý nghĩa ba tab, khoảng hiển thị, các ô tóm tắt và cách xóa/hoàn tác. Schema database không đổi |
