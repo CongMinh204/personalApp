@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app/shell_controller.dart';
+import '../features/habits/habits_screen.dart';
 import '../features/timer/timer_screen.dart';
 import '../features/today/today_screen.dart';
 
@@ -26,10 +27,7 @@ class _HomeShellState extends State<HomeShell> {
           const _ComingSoon(title: 'Lịch', icon: Icons.calendar_month_rounded),
           const TimerScreen(),
           const _ComingSoon(title: 'Thống kê', icon: Icons.insights_rounded),
-          const _ComingSoon(
-            title: 'Thói quen',
-            icon: Icons.local_fire_department_rounded,
-          ),
+          const HabitsScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(

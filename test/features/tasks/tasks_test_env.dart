@@ -5,11 +5,13 @@ import 'package:personal_app/app/routes.dart';
 import 'package:personal_app/app/settings_controller.dart';
 import 'package:personal_app/app/shell_controller.dart';
 import 'package:personal_app/data/fake/fake_focus_repository.dart';
+import 'package:personal_app/data/fake/fake_habit_repository.dart';
 import 'package:personal_app/data/fake/fake_store.dart';
 import 'package:personal_app/data/fake/fake_tag_repository.dart';
 import 'package:personal_app/data/fake/fake_task_repository.dart';
 import 'package:personal_app/data/models/task.dart';
 import 'package:personal_app/data/repositories/focus_repository.dart';
+import 'package:personal_app/data/repositories/habit_repository.dart';
 import 'package:personal_app/data/repositories/tag_repository.dart';
 import 'package:personal_app/data/repositories/task_repository.dart';
 import 'package:personal_app/features/timer/countdown_controller.dart';
@@ -39,6 +41,7 @@ class TasksEnv {
   late final tasks = FakeTaskRepository(store);
   late final tags = FakeTagRepository(store);
   late final focus = FakeFocusRepository(store);
+  late final habits = FakeHabitRepository(store);
 
   /// Đồng hồ giả dùng chung cho đồng hồ đếm ngược và bấm giờ; tiến bằng tay.
   late final clock = FakeClock(testNow);
@@ -95,6 +98,7 @@ class TasksEnv {
           Provider<TaskRepository>.value(value: tasks),
           Provider<TagRepository>.value(value: tags),
           Provider<FocusRepository>.value(value: focus),
+          Provider<HabitRepository>.value(value: habits),
           ChangeNotifierProvider<SettingsController>.value(value: settings),
           ChangeNotifierProvider<ShellController>.value(value: shell),
           ChangeNotifierProvider<TimerController>.value(value: timer),
