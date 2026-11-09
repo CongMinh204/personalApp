@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../features/focus_history/focus_history_screen.dart';
 import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/settings/tag_manager_screen.dart';
@@ -56,6 +57,7 @@ abstract final class AppRoutes {
     settings: (_) => const SettingsScreen(),
     tagManager: (_) => const TagManagerScreen(),
     search: (_) => const SearchScreen(),
+    focusHistory: (_) => const FocusHistoryScreen(),
     taskDetail: (context) =>
         TaskDetailScreen(taskId: _argument<String>(context)!),
     taskEdit: (context) {
