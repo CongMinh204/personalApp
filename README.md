@@ -2,7 +2,7 @@
 
 Ứng dụng todo cá nhân viết bằng Flutter, giao diện tiếng Việt, tối giản, bo góc lớn, màu nhấn xanh tím.
 
-Hiện có các màn **Hôm nay**, **Thêm/sửa việc**, **Chi tiết việc**, **Tìm kiếm**, **Cài đặt** và **Quản lý nhãn**. Các tab Lịch, Hẹn giờ, Thống kê và Thói quen đang hiện "Sắp có".
+Hiện có các màn **Hôm nay**, **Thêm/sửa việc**, **Chi tiết việc**, **Tìm kiếm**, **Hẹn giờ**, **Cài đặt** và **Quản lý nhãn**. Các tab Lịch, Thống kê, Thói quen và màn Lịch sử tập trung đang hiện "Sắp có".
 
 ## Tính năng
 
@@ -18,6 +18,7 @@ Hiện có các màn **Hôm nay**, **Thêm/sửa việc**, **Chi tiết việc**
 - Thêm/sửa việc: tiêu đề, ghi chú, ngày (hoặc không có ngày), cả ngày hoặc giờ bắt đầu–kết thúc, nhắc trước, lặp lại, ưu tiên, một nhãn (có thể tạo nhãn mới ngay trong form), việc con.
 - Chi tiết việc: thông tin, việc con, thời gian đã tập trung, nút Bắt đầu / Sửa / Xóa.
 - Tìm kiếm (biểu tượng ở header Hôm nay): tìm theo tiêu đề, ghi chú và tên nhãn (không phân biệt hoa thường và dấu tiếng Việt: gõ "hoc tap" vẫn ra "Học tập"), lọc Chưa xong / Đã xong / theo nhãn, "Tìm gần đây" (tối đa 5 từ khóa).
+- Hẹn giờ: đếm ngược Pomodoro (Pomodoro, Nghỉ ngắn, Nghỉ dài, Tùy chỉnh 1–180 phút; chu kỳ 4 phiên rồi nghỉ dài) và bấm giờ có vòng (nhanh nhất / chậm nhất). Chọn việc để tập trung; phiên hết giờ hoặc bỏ dở được lưu và cộng vào "Đã tập trung" ở Chi tiết việc. Đồng hồ chạy tiếp khi đổi tab. Hết giờ thì rung, phát âm hệ thống và hiện hộp báo (thông báo khi app ở nền làm sau).
 - Cài đặt (bánh răng ở header Hôm nay): chủ đề sáng/tối/hệ thống, 5 màu nhấn, ngày đầu tuần, nhắc trước mặc định, Pomodoro và giờ nghỉ, xóa các việc đã hoàn thành. Quản lý nhãn (mở từ Cài đặt): thêm, sửa, xóa nhãn.
 - Tầng lưu trữ SQLite (sqflite) đã xong và có test; Android, iOS, macOS dùng SQLite, web và Windows dùng bản Fake trong bộ nhớ (`lib/app/dependencies.dart`). Trên Android database lúc đầu trống; bản Fake (web, Windows) có dữ liệu mẫu ở `lib/data/fake/sample_data.dart`.
 - Model, bảng và repository dùng chung của nhóm: [docs/DATA_CONTRACT.md](docs/DATA_CONTRACT.md).
@@ -104,7 +105,7 @@ utils/                     vi_date (ngày giờ tiếng Việt), dates (khoảng
 screens/home_shell.dart    khung 5 tab (tab đang mở do ShellController giữ)
 app/settings_controller.dart  cài đặt lưu bằng shared_preferences (key: docs/DATA_CONTRACT.md mục 8)
 app/shell_controller.dart  tab đang mở; app/routes.dart tên các màn không phải tab
-features/timer/            TimerController.prepare(taskId): chọn sẵn việc rồi mở tab Hẹn giờ
+features/timer/            timer_screen, countdown_controller (đếm ngược, chu kỳ, lưu phiên), stopwatch_controller, TimerController.prepare(taskId)
 features/today/            màn Hôm nay: today_screen, task_groups (groupTasks, nextTask)
 features/today/widgets/    task_tile, progress_card, empty_state
 features/search/           search_screen, recent_searches (tìm gần đây), search_filter

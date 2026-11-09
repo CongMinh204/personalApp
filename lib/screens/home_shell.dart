@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app/shell_controller.dart';
+import '../features/timer/timer_screen.dart';
 import '../features/today/today_screen.dart';
 
 /// Khung 5 tab. Tab đang mở do [ShellController] giữ để màn nào cũng chuyển
@@ -23,7 +24,7 @@ class _HomeShellState extends State<HomeShell> {
         children: [
           const TodayScreen(),
           const _ComingSoon(title: 'Lịch', icon: Icons.calendar_month_rounded),
-          const _ComingSoon(title: 'Hẹn giờ', icon: Icons.timer_outlined),
+          const TimerScreen(),
           const _ComingSoon(title: 'Thống kê', icon: Icons.insights_rounded),
           const _ComingSoon(
             title: 'Thói quen',

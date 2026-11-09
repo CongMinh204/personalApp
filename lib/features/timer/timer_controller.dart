@@ -2,8 +2,9 @@ import 'package:flutter/foundation.dart';
 
 import '../../app/shell_controller.dart';
 
-/// Điều khiển tab Hẹn giờ. Hiện mới có phần chọn sẵn việc; đếm ngược, bấm giờ
-/// và lưu phiên làm ở bước Hẹn giờ.
+/// Chuyển việc từ nơi khác (nút đồng hồ ở Hôm nay, nút Bắt đầu ở Chi tiết việc)
+/// sang tab Hẹn giờ: chọn sẵn việc rồi mở tab. Màn Hẹn giờ nhận việc đó, đặt
+/// vào bộ đếm ngược rồi gọi [clearPrepared].
 class TimerController extends ChangeNotifier {
   TimerController(this._shell);
 
