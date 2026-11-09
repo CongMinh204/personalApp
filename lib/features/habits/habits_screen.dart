@@ -102,9 +102,9 @@ class _HabitsScreenState extends State<HabitsScreen> {
   void _openArchived() =>
       Navigator.of(context).pushNamed(AppRoutes.habitArchived);
 
-  // Tạm thời mở màn Sửa; màn Chi tiết thói quen sẽ thay chỗ này ở nhánh sau.
   void _openHabit(Habit habit) =>
-      Navigator.of(context).pushNamed(AppRoutes.habitEdit, arguments: habit.id);
+      Navigator.of(context)
+          .pushNamed(AppRoutes.habitDetail, arguments: habit.id);
 
   @override
   Widget build(BuildContext context) {

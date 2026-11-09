@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../features/focus_history/focus_history_screen.dart';
 import '../features/habits/habit_archived_screen.dart';
+import '../features/habits/habit_detail_screen.dart';
 import '../features/habits/habit_edit_screen.dart';
 import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
@@ -66,6 +67,8 @@ abstract final class AppRoutes {
       return HabitEditScreen(habitId: argument is String ? argument : null);
     },
     habitArchived: (_) => const HabitArchivedScreen(),
+    habitDetail: (context) =>
+        HabitDetailScreen(habitId: _argument<String>(context)!),
     taskDetail: (context) =>
         TaskDetailScreen(taskId: _argument<String>(context)!),
     taskEdit: (context) {

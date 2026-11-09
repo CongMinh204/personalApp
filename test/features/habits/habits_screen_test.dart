@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:personal_app/data/models/habit.dart';
 import 'package:personal_app/features/habits/habit_archived_screen.dart';
+import 'package:personal_app/features/habits/habit_detail_screen.dart';
 import 'package:personal_app/features/habits/habit_edit_screen.dart';
 import 'package:personal_app/features/habits/habits_screen.dart';
 
@@ -229,13 +230,14 @@ void main() {
       expect(find.byType(HabitArchivedScreen), findsOneWidget);
     });
 
-    testWidgets('bấm vào một thói quen mở form sửa của nó', (tester) async {
+    testWidgets('bấm vào một thói quen mở Chi tiết của nó', (tester) async {
       await openHabits(tester);
 
       await tester.tap(find.text('Đọc sách 20 phút'));
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(AppBar, 'Sửa thói quen'), findsOneWidget);
+      expect(find.byType(HabitDetailScreen), findsOneWidget);
+      expect(find.widgetWithText(AppBar, 'Chi tiết'), findsOneWidget);
       expect(find.text('Đọc sách 20 phút'), findsOneWidget);
     });
   });
