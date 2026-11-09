@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/settings/tag_manager_screen.dart';
 import '../features/tasks/task_detail_screen.dart';
@@ -54,6 +55,7 @@ abstract final class AppRoutes {
   static final _builders = <String, WidgetBuilder>{
     settings: (_) => const SettingsScreen(),
     tagManager: (_) => const TagManagerScreen(),
+    search: (_) => const SearchScreen(),
     taskDetail: (context) =>
         TaskDetailScreen(taskId: _argument<String>(context)!),
     taskEdit: (context) {
