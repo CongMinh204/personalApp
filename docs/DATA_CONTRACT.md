@@ -192,6 +192,14 @@ Code nằm ở `lib/data/habit_streak.dart`, đã có test. E muốn đổi quy 
 **B (Việc)**
 - Hoàn thành hay bỏ hoàn thành đều gọi `setDone`; không sửa `done` qua `update`.
 - Việc lặp lại: khi hoàn thành, giữ nguyên việc đã xong (để Thống kê đếm được) và `add` lần kế tiếp thành một việc mới, id mới.
+  - Việc con của lần kế tiếp được sao chép sang, đặt lại chưa xong, id mới.
+  - Giờ bắt đầu, giờ kết thúc, nhãn, ưu tiên, nhắc trước và kiểu lặp giữ nguyên.
+  - Hoàn thành trễ thì nhảy tới lần lặp đầu tiên từ hôm nay trở đi (không tạo việc đã quá hạn).
+  - Lặp theo tháng giữ cùng ngày trong tháng, tháng ngắn hơn lấy ngày cuối tháng (31/1 → 28/2); các lần sau tính tiếp từ ngày đã rút ngắn vì việc không lưu ngày gốc.
+  - Việc không có ngày thì không tạo lần kế tiếp; việc lặp lại bắt buộc có ngày.
+  - Bỏ đánh dấu xong không xóa việc kế tiếp đã tạo.
+- Xóa rồi hoàn tác: các phiên tập trung của việc đó đã chuyển thành "không gắn việc" và không được gắn lại.
+- Mỗi việc chỉ có một nhãn; bấm lại nhãn đang chọn để bỏ nhãn. Nhắc trước cũng bỏ được bằng cách bấm lại mức đang chọn (`reminderMinutes` = `null`).
 - Hoàn tác xóa: giữ lại task và việc con trước khi xóa, rồi gọi `add(task, subtasks: …)` với đúng các bản cũ.
 - "Tìm gần đây" B tự lưu bằng shared_preferences, key bắt đầu bằng `search_`.
 
@@ -261,3 +269,4 @@ Màn Tìm kiếm tự lưu "tìm gần đây" bằng key bắt đầu bằng `se
 | 1 | 07/11/2026 | Bản đầu, chờ nhóm duyệt |
 | 1.1 | 09/11/2026 | Dự án chuyển sang một người làm; hợp đồng không đổi schema, vẫn là khung thiết kế cho bước 1 trở đi |
 | 1.2 | 09/11/2026 | Chốt mục 8 (cài đặt dùng chung) khi làm `SettingsController`: thêm 5 key (`reminders_enabled`, `morning_summary_enabled`, `short_break_minutes`, `long_break_minutes`, `auto_next_session`) và khoảng hợp lệ của từng key. Schema database không đổi |
+| 1.3 | 10/11/2026 | Bước 4: ghi thêm quy tắc việc lặp lại, hoàn tác xóa và chọn nhãn/nhắc trước ở mục 6 (B). Schema database không đổi |
