@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../data/focus_session_repository.dart';
 import '../data/sample_tasks.dart';
+import '../logic/countdown_controller.dart';
+import '../logic/stopwatch_controller.dart';
+import '../models/task.dart';
+import '../services/timer_notification_service.dart';
+import 'timer_screen.dart';
 import 'today_screen.dart';
 
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key, this.onToggleTheme});
+  const HomeShell({super.key, this.focusRepository, this.onToggleTheme});
 
+  /// Mặc định mở SQLite ở lần dùng đầu tiên; truyền vào khi test.
+  final FocusSessionRepository? focusRepository;
   final VoidCallback? onToggleTheme;
 
   @override
@@ -16,6 +24,25 @@ class _HomeShellState extends State<HomeShell> {
   final _initialTasks = sampleTasks(DateTime.now());
   int _index = 0;
 
+  // Hẹn giờ: đặt ở shell để đồng hồ vẫn chạy khi chuyển tab.
+  late final FocusSessionRepository _focusRepository =
+      widget.focusRepository ?? LazyFocusSessionRepository();
+  late final CountdownController _countdown = CountdownController(
+    repository: _focusRepository,
+    notifications: TimerNotificationService.instance,
+  );
+  final _stopwatch = StopwatchController();
+
+  // Bản sao danh sách việc mới nhất từ màn Hôm nay, dùng cho bộ chọn việc.
+  late List<Task> _tasks = _initialTasks;
+
+  @override
+  void dispose() {
+    _countdown.dispose();
+    _stopwatch.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,9 +52,18 @@ class _HomeShellState extends State<HomeShell> {
           TodayScreen(
             initialTasks: _initialTasks,
             onToggleTheme: widget.onToggleTheme,
+            onTasksChanged: (tasks) => _tasks = tasks,
           ),
           const _ComingSoon(title: 'Lịch', icon: Icons.calendar_month_rounded),
-          const _ComingSoon(title: 'Hẹn giờ', icon: Icons.timer_outlined),
+          TimerScreen(
+            countdown: _countdown,
+            stopwatch: _stopwatch,
+            repository: _focusRepository,
+            loadTasks: () async => [
+              for (final t in _tasks)
+                if (!t.done) TaskRef(t.id, t.title),
+            ],
+          ),
           const _ComingSoon(title: 'Thống kê', icon: Icons.insights_rounded),
           const _ComingSoon(title: 'Cài đặt', icon: Icons.settings_outlined),
         ],

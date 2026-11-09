@@ -2,7 +2,7 @@ name: personal_app
 description: "App todo cá nhân"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -33,6 +33,13 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  # Hẹn giờ (phần D): lưu lịch sử tập trung + thông báo hết giờ.
+  sqflite: ^2.4.1
+  path: ^1.9.0
+  # Giữ v19: API zonedSchedule/initialize dùng tham số vị trí như trong code.
+  flutter_local_notifications: ^19.0.0
+  timezone: ^0.10.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -49,7 +56,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

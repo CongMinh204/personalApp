@@ -14,9 +14,14 @@ class TodayScreen extends StatefulWidget {
     required this.initialTasks,
     this.clock = DateTime.now,
     this.onToggleTheme,
+    this.onTasksChanged,
   });
 
   final List<Task> initialTasks;
+
+  /// Gọi mỗi khi danh sách việc thay đổi (thêm / xóa / hoàn tác / tick xong),
+  /// để tab Hẹn giờ biết các việc đang có. Bỏ đi khi đã có kho dữ liệu chung.
+  final ValueChanged<List<Task>>? onTasksChanged;
 
   /// Nguồn thời gian hiện tại; thay bằng giờ cố định khi test.
   final DateTime Function() clock;
@@ -32,16 +37,20 @@ class _TodayScreenState extends State<TodayScreen> {
   late final List<Task> _tasks = List.of(widget.initialTasks);
   TaskTag? _filter;
 
+  void _publish() => widget.onTasksChanged?.call(List.unmodifiable(_tasks));
+
   void _toggleDone(Task task) {
     final index = _tasks.indexWhere((t) => t.id == task.id);
     if (index < 0) return;
     setState(() => _tasks[index] = task.copyWith(done: !task.done));
+    _publish();
   }
 
   void _delete(Task task) {
     final index = _tasks.indexWhere((t) => t.id == task.id);
     if (index < 0) return;
     setState(() => _tasks.removeAt(index));
+    _publish();
     _messengerKey.currentState!
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -50,9 +59,12 @@ class _TodayScreenState extends State<TodayScreen> {
           persist: false,
           action: SnackBarAction(
             label: 'Hoàn tác',
-            onPressed: () => setState(
-              () => _tasks.insert(index.clamp(0, _tasks.length), task),
-            ),
+            onPressed: () {
+              setState(
+                () => _tasks.insert(index.clamp(0, _tasks.length), task),
+              );
+              _publish();
+            },
           ),
         ),
       );
@@ -62,6 +74,7 @@ class _TodayScreenState extends State<TodayScreen> {
     final task = await showQuickAddSheet(context, now: widget.clock());
     if (task == null || !mounted) return;
     setState(() => _tasks.add(task));
+    _publish();
   }
 
   void _showSearchSoon() {
