@@ -25,7 +25,8 @@ abstract interface class TaskRepository {
 
   Stream<Task?> watchById(String id);
 
-  /// Tìm trong tiêu đề, ghi chú và tên nhãn, không phân biệt hoa thường.
+  /// Tìm trong tiêu đề, ghi chú và tên nhãn, không phân biệt hoa thường và
+  /// dấu tiếng Việt ("hoc tap" tìm ra "Học tập").
   /// [query] rỗng trả về danh sách rỗng. Sắp theo due, việc không có ngày ở
   /// cuối.
   Future<List<Task>> search(String query);

@@ -265,6 +265,30 @@ void runRepositoryContract(
         },
       );
 
+      test(
+        'search bỏ qua dấu tiếng Việt: "hoc tap" tìm ra "Học tập"',
+        () async {
+          await repos.tasks.add(task('a', title: 'Học bài'));
+          await repos.tasks.add(task('b', title: 'Họp nhóm'));
+          await repos.tasks.add(task('c', title: 'Hộp thư'));
+          await repos.tasks.add(task('d', title: 'Đọc sách'));
+          await repos.tasks.add(
+            task('e', title: 'Bài tập', tagId: DefaultTagIds.study),
+          );
+
+          Future<List<String>> ids(String query) async => [
+            for (final t in await repos.tasks.search(query)) t.id,
+          ];
+          // "hoc" khớp tiêu đề "Học bài" và cả tên nhãn "Học tập" của việc e.
+          expect(await ids('hoc'), unorderedEquals(['a', 'e']));
+          expect(await ids('hop'), unorderedEquals(['b', 'c']));
+          expect(await ids('DOC'), ['d']);
+          expect(await ids('hoc tap'), ['e']); // theo tên nhãn "Học tập"
+          expect(await ids('học tập'), ['e']);
+          expect(await ids('HOC TAP'), ['e']);
+        },
+      );
+
       test('countDoneByDay đủ các ngày, tính theo completedAt', () async {
         await repos.tasks.add(task('a'));
         await repos.tasks.add(task('b'));

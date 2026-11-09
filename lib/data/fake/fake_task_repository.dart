@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' show DateTimeRange;
 
 import '../../utils/dates.dart';
+import '../../utils/text_search.dart';
 import '../models/subtask.dart';
 import '../models/task.dart';
 import '../repositories/task_repository.dart';
@@ -45,13 +46,13 @@ class FakeTaskRepository implements TaskRepository {
 
   @override
   Future<List<Task>> search(String query) async {
-    final needle = query.trim().toLowerCase();
+    final needle = foldVietnamese(query.trim());
     if (needle.isEmpty) return [];
     bool matches(Task t) {
       final tagName = _store.tags[t.tagId]?.name ?? '';
-      return t.title.toLowerCase().contains(needle) ||
-          t.note.toLowerCase().contains(needle) ||
-          tagName.toLowerCase().contains(needle);
+      return containsFolded(t.title, needle) ||
+          containsFolded(t.note, needle) ||
+          containsFolded(tagName, needle);
     }
 
     return _sorted(_all().where(matches));
