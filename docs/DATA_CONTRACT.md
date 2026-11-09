@@ -212,9 +212,14 @@ Code nằm ở `lib/data/habit_streak.dart`, đã có test. E muốn đổi quy 
   - việc không có ngày: không tính.
 
 **D (Hẹn giờ)**
-- Lưu `FocusSession` khi phiên hết giờ hoặc bị dừng. `durationSec` là thời gian chạy thực tế.
-- `taskId` lấy từ `TimerController` (làm ở bước 2); để `null` nếu phiên không gắn việc.
-- Giờ nghỉ (`short`, `long`) vẫn lưu, nhưng không tính vào thời gian tập trung của việc.
+- Lưu `FocusSession` khi phiên hết giờ hoặc bị dừng giữa chừng. `durationSec` là thời gian chạy thực tế, không tính lúc tạm dừng.
+- Phiên **hoàn thành** (`completed = true`): chạy hết giờ, `durationSec` bằng thời lượng đặt.
+- Phiên **bỏ dở** (`completed = false`): bị dừng trước khi hết giờ bằng Đặt lại, Bỏ qua phiên hoặc đổi chế độ khi đang chạy hoặc tạm dừng. Chỉ lưu nếu đã chạy từ **10 giây** trở lên (ít hơn coi như bấm nhầm). Chưa bấm Chạy thì không lưu gì.
+- `taskId` là việc chọn lúc bắt đầu phiên và không đổi được khi phiên đang chạy; `null` nếu không gắn việc, hoặc việc đã bị xóa trong lúc đếm.
+- Giờ nghỉ (`short`, `long`) vẫn lưu nhưng **không gắn việc** (`taskId` = `null`) và không tính vào thời gian tập trung của việc. Lịch sử tập trung **không hiện** phiên nghỉ (theo mockup) và các số tóm tắt chỉ tính phiên tập trung.
+- Chu kỳ Pomodoro: 4 phiên tập trung (`pomodoro`) xen nghỉ ngắn, sau phiên thứ 4 là nghỉ dài, rồi chu kỳ bắt đầu lại. Chế độ Tùy chỉnh (`custom`, 1–180 phút) đứng ngoài chu kỳ.
+- **Bấm giờ (stopwatch) không lưu** vào lịch sử (hợp đồng không có loại phiên cho nó); các vòng chỉ để đo.
+- Đồng hồ không được khôi phục nếu tắt hẳn app khi đang chạy (phiên đang chạy bị mất, không lưu).
 
 **E (Thói quen)**
 - `icon` là khóa chữ, `color` là `Color`.
@@ -271,3 +276,4 @@ Màn Tìm kiếm tự lưu "tìm gần đây" bằng key bắt đầu bằng `se
 | 1.2 | 09/11/2026 | Chốt mục 8 (cài đặt dùng chung) khi làm `SettingsController`: thêm 5 key (`reminders_enabled`, `morning_summary_enabled`, `short_break_minutes`, `long_break_minutes`, `auto_next_session`) và khoảng hợp lệ của từng key. Schema database không đổi |
 | 1.3 | 10/11/2026 | Bước 4: ghi thêm quy tắc việc lặp lại, hoàn tác xóa và chọn nhãn/nhắc trước ở mục 6 (B). Schema database không đổi |
 | 1.4 | 10/11/2026 | Màn Tìm kiếm: chốt key `search_recent` và quy tắc ghi nhớ từ khóa ở mục 6; `search` bỏ qua dấu tiếng Việt (trước đây chỉ bỏ qua hoa thường). Schema database không đổi |
+| 1.5 | 10/11/2026 | Bước 5 (Hẹn giờ): chốt ở mục 6 (D) quy tắc phiên hoàn thành và bỏ dở, ngưỡng lưu 10 giây, phiên nghỉ không gắn việc và không hiện trong lịch sử, bấm giờ không lưu. Schema database không đổi |
