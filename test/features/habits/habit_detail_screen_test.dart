@@ -116,6 +116,24 @@ void main() {
       expect(day('Ngày 29, Không có lịch'), findsOneWidget); // hôm nay, Thứ Năm
     });
 
+    testWidgets('trình đọc màn hình bấm được ngày có lịch đã qua, không bấm '
+        'được ngày chưa tới', (tester) async {
+      await openDetail(tester, 'habit-water');
+
+      expect(
+        tester.getSemantics(dayCell(16)),
+        isSemantics(
+          label: 'Ngày 16, Bỏ lỡ',
+          isButton: true,
+          hasTapAction: true,
+        ),
+      );
+      // Ngày chưa tới không phải nút và không có hành động bấm.
+      final upcoming = tester.widget<Semantics>(day('Ngày 30, Chưa tới'));
+      expect(upcoming.properties.button, isFalse);
+      expect(upcoming.properties.onTap, isNull);
+    });
+
     testWidgets('chuyển về tháng trước tới tháng bắt đầu rồi dừng', (
       tester,
     ) async {

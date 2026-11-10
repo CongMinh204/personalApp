@@ -16,6 +16,18 @@ const _shortWeekdays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 /// Nhật).
 String weekdayName(int weekday) => _weekdays[weekday - 1];
 
+/// "T5" cho [weekday] theo `DateTime.weekday`; Chủ Nhật là "CN".
+String weekdayShort(int weekday) => _shortWeekdays[weekday - 1];
+
+/// Tên các cột thứ của lịch theo ngày đầu tuần [weekStart] (1 = Thứ Hai,
+/// 7 = Chủ Nhật): ["T2", …, "CN"] khi tuần bắt đầu từ Thứ Hai.
+List<String> weekdayHeaders(int weekStart) => [
+  for (var i = 0; i < 7; i++) weekdayShort((weekStart - 1 + i) % 7 + 1),
+];
+
+/// "Tháng 10, 2026".
+String monthTitle(DateTime month) => 'Tháng ${month.month}, ${month.year}';
+
 String _two(int n) => n.toString().padLeft(2, '0');
 
 String _dayMonth(DateTime d) => '${_two(d.day)}/${_two(d.month)}';

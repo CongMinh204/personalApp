@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../data/models/habit.dart';
 import '../../utils/dates.dart';
+import '../../utils/vi_date.dart';
+
+export '../../utils/vi_date.dart' show weekdayShort;
 
 // ---- Biểu tượng và màu -----------------------------------------------------
 
@@ -55,9 +58,6 @@ Color habitInkColor(Color color, Brightness brightness) =>
     : color;
 
 // ---- Lịch và tiến độ trong ngày -------------------------------------------
-
-/// "T2", "T3", … "CN" cho [weekday] theo `DateTime.weekday`.
-String weekdayShort(int weekday) => weekday == 7 ? 'CN' : 'T${weekday + 1}';
 
 /// Thói quen có lịch vào [day] không: thứ nằm trong `repeatDays` và ngày đó
 /// không trước ngày bắt đầu.

@@ -507,6 +507,9 @@ class _DayCellView extends StatelessWidget {
     return Semantics(
       button: onTap != null,
       label: 'Ngày ${cell.date.day}, ${_labels[cell.status]}',
+      // Bỏ ngữ nghĩa của các widget con nên phải gắn hành động bấm ở đây thì
+      // trình đọc màn hình mới bấm được.
+      onTap: onTap,
       excludeSemantics: true,
       child: InkResponse(
         key: ValueKey('day-${dateKey(cell.date)}'),

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:personal_app/app/dependencies.dart';
 import 'package:personal_app/app/settings_controller.dart';
 import 'package:personal_app/app/shell_controller.dart';
+import 'package:personal_app/features/calendar/calendar_screen.dart';
 import 'package:personal_app/features/timer/countdown_controller.dart';
 import 'package:personal_app/features/timer/timer_controller.dart';
 import 'package:personal_app/main.dart';
@@ -72,6 +73,7 @@ void main() {
       await tester.tap(navLabel('Lịch'));
       await tester.pumpAndSettle();
       expect(shell.tab, HomeTab.calendar);
+      expect(find.byType(CalendarScreen), findsOneWidget);
     });
 
     testWidgets('TimerController.prepare chuyển sang tab Hẹn giờ', (

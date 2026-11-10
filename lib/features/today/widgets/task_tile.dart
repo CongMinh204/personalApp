@@ -15,6 +15,8 @@ class TaskTile extends StatelessWidget {
     this.onTap,
     this.onTimer,
     this.overdue = false,
+    this.timeLabel,
+    this.color,
   });
 
   final Task task;
@@ -32,6 +34,13 @@ class TaskTile extends StatelessWidget {
   final VoidCallback? onTimer;
   final bool overdue;
 
+  /// Nhãn giờ thay cho nhãn mặc định (`taskTimeLabel`), ví dụ ở Lịch ngày đã
+  /// ghi ở tiêu đề nên chỉ cần "14:00 – 15:00" hoặc "Cả ngày".
+  final String? timeLabel;
+
+  /// Màu nền của thẻ; mặc định theo `cardTheme`.
+  final Color? color;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -42,6 +51,7 @@ class TaskTile extends StatelessWidget {
     final tag = this.tag;
 
     return Card(
+      color: color,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
@@ -91,7 +101,7 @@ class TaskTile extends StatelessWidget {
                       children: [
                         _Meta(
                           icon: Icons.schedule_rounded,
-                          label: taskTimeLabel(task, now),
+                          label: timeLabel ?? taskTimeLabel(task, now),
                           color: overdue ? scheme.error : muted,
                         ),
                         if (task.subtaskTotal > 0)

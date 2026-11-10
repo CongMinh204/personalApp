@@ -2,7 +2,7 @@
 
 Ứng dụng todo cá nhân viết bằng Flutter, giao diện tiếng Việt, tối giản, bo góc lớn, màu nhấn xanh tím.
 
-Hiện có các màn **Hôm nay**, **Thêm/sửa việc**, **Chi tiết việc**, **Tìm kiếm**, **Hẹn giờ**, **Lịch sử tập trung**, **Thói quen** (danh sách, Chi tiết, Thêm/sửa, Đã lưu trữ), **Cài đặt** và **Quản lý nhãn**. Các tab Lịch và Thống kê đang hiện "Sắp có".
+Hiện có các màn **Hôm nay**, **Lịch**, **Thêm/sửa việc**, **Chi tiết việc**, **Tìm kiếm**, **Hẹn giờ**, **Lịch sử tập trung**, **Thói quen** (danh sách, Chi tiết, Thêm/sửa, Đã lưu trữ), **Cài đặt** và **Quản lý nhãn**. Tab Thống kê đang hiện "Sắp có".
 
 ## Tính năng
 
@@ -15,6 +15,7 @@ Hiện có các màn **Hôm nay**, **Thêm/sửa việc**, **Chi tiết việc**
   - Việc có lặp lại: hoàn thành thì tự tạo việc cho lần kế tiếp.
   - Nút đồng hồ trên mỗi việc chưa xong mở tab Hẹn giờ với việc đó chọn sẵn.
   - Bấm vào việc mở Chi tiết; nút "+" mở form Thêm việc.
+- Lịch (tab thứ 2): xem Tháng hoặc Tuần, nút ◀ ▶ (sang tháng/tuần khác) và "Hôm nay"; ngày có việc có chấm, ngày đầu tuần theo Cài đặt. Chạm một ngày để xem việc của ngày đó: việc cả ngày ("Không có giờ"), dải giờ của việc có giờ (màu theo nhãn, vạch đỏ là giờ hiện tại), rồi danh sách việc của ngày (bấm checkbox để hoàn thành, bấm việc mở Chi tiết, nút đồng hồ mở Hẹn giờ). Ngày trống có nút "Thêm việc vào ngày này" (form Thêm việc điền sẵn ngày đó).
 - Thêm/sửa việc: tiêu đề, ghi chú, ngày (hoặc không có ngày), cả ngày hoặc giờ bắt đầu–kết thúc, nhắc trước, lặp lại, ưu tiên, một nhãn (có thể tạo nhãn mới ngay trong form), việc con.
 - Chi tiết việc: thông tin, việc con, thời gian đã tập trung, nút Bắt đầu / Sửa / Xóa.
 - Tìm kiếm (biểu tượng ở header Hôm nay): tìm theo tiêu đề, ghi chú và tên nhãn (không phân biệt hoa thường và dấu tiếng Việt: gõ "hoc tap" vẫn ra "Học tập"), lọc Chưa xong / Đã xong / theo nhãn, "Tìm gần đây" (tối đa 5 từ khóa).
@@ -104,10 +105,11 @@ data/repositories/         interface repository (xem docs/DATA_CONTRACT.md)
 data/fake/                 bản Fake trong bộ nhớ và dữ liệu mẫu
 data/sqlite/               AppDatabase (6 bảng, khóa ngoại, index) và 4 repository SQLite
 app/dependencies.dart      chỗ duy nhất chọn SQLite hay Fake; main.dart đưa xuống bằng Provider
-utils/                     vi_date (ngày giờ tiếng Việt), dates (khoảng ngày) — dùng chung
+utils/                     vi_date (ngày giờ tiếng Việt, tên thứ, "Tháng 10, 2026"), dates (khoảng ngày) — dùng chung
 screens/home_shell.dart    khung 5 tab (tab đang mở do ShellController giữ)
 app/settings_controller.dart  cài đặt lưu bằng shared_preferences (key: docs/DATA_CONTRACT.md mục 8)
 app/shell_controller.dart  tab đang mở; app/routes.dart tên các màn không phải tab
+features/calendar/         calendar_screen, calendar_logic (lưới tháng/tuần, ◀ ▶, dải giờ, việc của ngày)
 features/habits/           habits_screen, habit_detail_screen, habit_edit_screen, habit_archived_screen, habit_logic, habit_detail_logic (lịch tháng, tuần, tỷ lệ)
 features/focus_history/    focus_history_screen, focus_history_logic (gom nhóm, tóm tắt, định dạng)
 features/timer/            timer_screen, countdown_controller (đếm ngược, chu kỳ, lưu phiên), stopwatch_controller, TimerController.prepare(taskId)
