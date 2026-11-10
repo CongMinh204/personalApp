@@ -4,6 +4,7 @@ import 'package:personal_app/app/dependencies.dart';
 import 'package:personal_app/app/settings_controller.dart';
 import 'package:personal_app/app/shell_controller.dart';
 import 'package:personal_app/features/calendar/calendar_screen.dart';
+import 'package:personal_app/features/stats/stats_screen.dart';
 import 'package:personal_app/features/timer/countdown_controller.dart';
 import 'package:personal_app/features/timer/timer_controller.dart';
 import 'package:personal_app/main.dart';
@@ -74,6 +75,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(shell.tab, HomeTab.calendar);
       expect(find.byType(CalendarScreen), findsOneWidget);
+
+      await tester.tap(navLabel('Thống kê'));
+      await tester.pumpAndSettle();
+      expect(shell.tab, HomeTab.stats);
+      expect(find.byType(StatsScreen), findsOneWidget);
+      // Không còn tab nào hiện "Sắp có".
+      expect(find.text('Sắp có', skipOffstage: false), findsNothing);
     });
 
     testWidgets('TimerController.prepare chuyển sang tab Hẹn giờ', (

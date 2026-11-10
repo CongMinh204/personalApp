@@ -125,15 +125,15 @@ Từ bước 1, lấy repository qua Provider, ví dụ `context.read<TaskReposi
 
 | Hàm | Màn dùng | Ý nghĩa |
 |---|---|---|
-| `watchAll()` | Hôm nay | mọi việc, cả việc đã xong; chia nhóm Quá hạn/Hôm nay/Sắp tới làm trong bộ nhớ (`groupTasks`) |
+| `watchAll()` | Hôm nay, Thống kê | mọi việc, cả việc đã xong; chia nhóm Quá hạn/Hôm nay/Sắp tới làm trong bộ nhớ (`groupTasks`) |
 | `getAll()` | chưa màn nào dùng | như `watchAll`, đọc một lần (dự phòng) |
 | `watchByDay(day)` | (dự phòng, chưa màn nào dùng) | việc có `due` trong ngày, sắp theo `due`; không gồm việc không có ngày |
 | `watchByRange(range)` | Lịch (chấm dưới ngày, dải giờ và danh sách việc của ngày đang chọn) | việc có `due` trong khoảng |
 | `getUnfinished()` | Nhắc việc (C) | việc chưa xong, để lên lịch lại thông báo khi mở app |
 | `getById(id)`, `watchById(id)` | Chi tiết, Sửa việc | trả `null` nếu không có |
 | `search(query)` | Tìm kiếm | tìm trong tiêu đề, ghi chú, tên nhãn; không phân biệt hoa thường và dấu tiếng Việt ("hoc tap" ra "Học tập", chuẩn hóa bằng `foldVietnamese`); `query` rỗng → `[]`. Lọc Chưa xong/Đã xong/theo nhãn thì màn tự làm |
-| `countDoneByDay(range)` | Thống kê | số việc xong mỗi ngày, tính theo `completedAt`; có đủ mọi ngày trong khoảng, ngày không có việc = 0 |
-| `getCompletedInRange(range)` | Thống kê | việc có `completedAt` trong khoảng (để tính đúng hạn, thống kê theo nhãn) |
+| `countDoneByDay(range)` | (dự phòng: Thống kê dùng `watchAll` để tự cập nhật) | số việc xong mỗi ngày, tính theo `completedAt`; có đủ mọi ngày trong khoảng, ngày không có việc = 0 |
+| `getCompletedInRange(range)` | (dự phòng, như trên) | việc có `completedAt` trong khoảng (để tính đúng hạn, thống kê theo nhãn) |
 | `add(task, subtasks:)` | Thêm việc, hoàn tác xóa | `taskId` của từng việc con phải bằng `task.id` |
 | `update(task, subtasks:)` | Sửa việc | không đổi `done`/`completedAt`. Có truyền `subtasks` thì thay toàn bộ việc con |
 | `setDone(id, done)` | mọi chỗ có checkbox | xong: `completedAt` = bây giờ; bỏ xong: `completedAt` = `null` |
@@ -211,10 +211,15 @@ Code nằm ở `lib/data/habit_streak.dart`, đã có test. E muốn đổi quy 
   - Danh sách việc của ngày: chưa xong trước, rồi việc có giờ theo giờ bắt đầu, việc cả ngày ở cuối. Việc chưa xong của ngày đã qua hiện là quá hạn (như màn Hôm nay). Hoàn thành việc lặp lại cũng tạo lần kế tiếp như ở Hôm nay.
 - id thông báo = `stableIntId(task.id)`. Khi mở app, lên lịch lại từ `getUnfinished()`.
 - Việc không có giờ (`hasTime = false`) thì nhắc lúc mấy giờ do C chọn, rồi ghi quyết định vào đây.
-- Đề xuất cách tính "đúng hạn" (C chốt rồi ghi lại vào đây):
-  - việc có giờ: xong trước `end` (nếu có) hoặc trước `due`;
-  - việc cả ngày: xong trước khi hết ngày `due`;
-  - việc không có ngày: không tính.
+- Thống kê (đã chốt 10/11/2026):
+  - Kỳ: 7 ngày = 7 ngày gần nhất kể cả hôm nay; Tháng = từ ngày 1 tháng này tới hôm nay; Năm = từ 1/1 năm nay tới hôm nay. Việc tính vào kỳ theo `completedAt`.
+  - So sánh số việc hoàn thành với kỳ liền trước cùng độ dài: 7 ngày ngay trước đó; cùng kỳ tháng trước (hôm nay 10/11 thì 1–10/10; tháng trước ngắn hơn thì tới hết tháng đó); cùng kỳ năm trước. Ghi "+5 so với tuần trước", "−2 so với cùng kỳ tháng trước" hoặc "Bằng …".
+  - Đúng hạn, trên các việc xong trong kỳ có ngày hẹn: việc có giờ xong không muộn hơn `end` (không có `end`, hoặc `end` không sau `due`, thì không muộn hơn `due`); việc cả ngày xong trong hoặc trước ngày `due`; việc không có ngày không tính. Chưa có việc nào để tính thì ghi "–".
+  - "N việc đang quá hạn": đếm như nhóm Quá hạn ở Hôm nay (chưa xong, ngày hẹn trước hôm nay), không phụ thuộc kỳ.
+  - Ngày liên tiếp: số ngày liền nhau có ít nhất một việc hoàn thành, tính tới hôm nay; hôm nay chưa xong việc nào thì tính tới hôm qua (chuỗi chưa đứt). Kỷ lục = chuỗi dài nhất từ trước tới nay. Không phụ thuộc kỳ (khác chuỗi của thói quen).
+  - Thời gian tập trung: tổng `durationSec` của phiên tập trung (`type.isFocus`, kể cả bỏ dở) có `startedAt` trong kỳ, đọc bằng `FocusRepository.watchByRange`; dòng phụ "N phiên tập trung" (Pomodoro và Tùy chỉnh).
+  - Biểu đồ: 7 ngày = 7 cột theo ngày (cột cuối "Nay"); Tháng = mỗi ngày của tháng một cột, ngày chưa tới để trống, không ghi số trên cột; Năm = 12 cột theo tháng. "TB x/ngày" (hoặc "/tháng") chia cho số ngày (tháng) đã qua của kỳ, kể cả hôm nay.
+  - Theo nhãn: việc xong trong kỳ theo nhãn, nhiều việc trước, phần trăm trên tổng số việc xong của kỳ; việc không nhãn gộp thành "Không nhãn".
 
 **D (Hẹn giờ)**
 - Lưu `FocusSession` khi phiên hết giờ hoặc bị dừng giữa chừng. `durationSec` là thời gian chạy thực tế, không tính lúc tạm dừng.
@@ -294,3 +299,4 @@ Màn Tìm kiếm tự lưu "tìm gần đây" bằng key bắt đầu bằng `se
 | 1.7 | 10/11/2026 | Bước 6a (Thói quen): chốt ở mục 6 (E) cách chấm trong ngày, thói quen không có lịch hôm nay, luật form Thêm/sửa, lưu trữ và xóa hẳn. Schema database không đổi |
 | 1.8 | 10/11/2026 | Bước 6b (Chi tiết thói quen): chốt ở mục 6 (E) cách tính Hoàn thành %, trạng thái ô lịch, 4 tuần gần nhất và việc bổ sung ngày đã qua. Schema database không đổi |
 | 1.9 | 10/11/2026 | Bước 7a (Lịch): chốt ở mục 6 (C) khoảng đọc việc, ◀ ▶, chấm dưới ngày, dải giờ và thứ tự danh sách việc của ngày; bảng mục 4 ghi Lịch dùng `watchByRange`. Schema database không đổi |
+| 1.10 | 10/11/2026 | Bước 7b (Thống kê): chốt ở mục 6 (C) kỳ, cách so sánh, đúng hạn, quá hạn, ngày liên tiếp, thời gian tập trung, biểu đồ và phần theo nhãn; bảng mục 4: Thống kê dùng `watchAll`, `countDoneByDay` và `getCompletedInRange` để dự phòng. Schema database không đổi |

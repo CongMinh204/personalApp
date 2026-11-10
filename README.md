@@ -2,7 +2,7 @@
 
 Ứng dụng todo cá nhân viết bằng Flutter, giao diện tiếng Việt, tối giản, bo góc lớn, màu nhấn xanh tím.
 
-Hiện có các màn **Hôm nay**, **Lịch**, **Thêm/sửa việc**, **Chi tiết việc**, **Tìm kiếm**, **Hẹn giờ**, **Lịch sử tập trung**, **Thói quen** (danh sách, Chi tiết, Thêm/sửa, Đã lưu trữ), **Cài đặt** và **Quản lý nhãn**. Tab Thống kê đang hiện "Sắp có".
+Hiện có các màn **Hôm nay**, **Lịch**, **Thêm/sửa việc**, **Chi tiết việc**, **Tìm kiếm**, **Hẹn giờ**, **Lịch sử tập trung**, **Thống kê**, **Thói quen** (danh sách, Chi tiết, Thêm/sửa, Đã lưu trữ), **Cài đặt** và **Quản lý nhãn**.
 
 ## Tính năng
 
@@ -20,6 +20,7 @@ Hiện có các màn **Hôm nay**, **Lịch**, **Thêm/sửa việc**, **Chi ti�
 - Chi tiết việc: thông tin, việc con, thời gian đã tập trung, nút Bắt đầu / Sửa / Xóa.
 - Tìm kiếm (biểu tượng ở header Hôm nay): tìm theo tiêu đề, ghi chú và tên nhãn (không phân biệt hoa thường và dấu tiếng Việt: gõ "hoc tap" vẫn ra "Học tập"), lọc Chưa xong / Đã xong / theo nhãn, "Tìm gần đây" (tối đa 5 từ khóa).
 - Hẹn giờ: đếm ngược Pomodoro (Pomodoro, Nghỉ ngắn, Nghỉ dài, Tùy chỉnh 1–180 phút; chu kỳ 4 phiên rồi nghỉ dài) và bấm giờ có vòng (nhanh nhất / chậm nhất). Chọn việc để tập trung; phiên hết giờ hoặc bỏ dở được lưu và cộng vào "Đã tập trung" ở Chi tiết việc. Đồng hồ chạy tiếp khi đổi tab. Hết giờ thì rung, phát âm hệ thống và hiện hộp báo (thông báo khi app ở nền làm sau).
+- Thống kê (tab thứ 4): chọn kỳ 7 ngày / Tháng (tháng này) / Năm (năm nay). Bốn ô: việc hoàn thành (so với kỳ liền trước cùng độ dài: "+5 so với tuần trước", "so với cùng kỳ tháng trước"), tỷ lệ đúng hạn kèm số việc đang quá hạn, số ngày liên tiếp có việc hoàn thành kèm kỷ lục, thời gian tập trung kèm số phiên. Biểu đồ cột việc hoàn thành (theo ngày, theo tháng ở kỳ Năm, có trung bình) và phần chia theo nhãn. Số liệu tự cập nhật khi xong việc hay có phiên tập trung mới.
 - Lịch sử tập trung (nút ở header Hẹn giờ): các phiên tập trung (Pomodoro, Tùy chỉnh; giờ nghỉ không hiện) gom theo Ngày / Tuần / Tháng, mỗi nhóm kèm tổng thời gian. Ba ô tóm tắt (Phiên, Hoàn thành x/y, và tổng thời gian tập trung của Tuần này / Tháng này / Năm nay) đổi theo tab. Mỗi dòng có tên việc, khoảng giờ, loại, thời lượng và huy hiệu Hoàn thành / Bỏ dở. Vuốt trái để xóa một phiên (có Hoàn tác).
 - Thói quen (tab thứ 5): thẻ "Thói quen hôm nay x/y", mỗi thói quen có biểu tượng màu, chuỗi ngày, tiến độ trong ngày ("5/8 ly", "Đã xong") và nút chấm (mục tiêu 1 lần: bấm là xong; nhiều lần: mỗi lần cộng 1). Thói quen không có lịch hôm nay mờ đi ở cuối danh sách. Thêm/sửa: tên, biểu tượng, màu, lặp lại (mỗi ngày hoặc theo thứ), mục tiêu mỗi ngày (kèm đơn vị khi nhiều lần), nhắc mỗi ngày, ngày bắt đầu, Lưu trữ và Xóa. Đã lưu trữ: khôi phục hoặc xóa hẳn.
 - Chi tiết thói quen (chạm vào một thói quen): chuỗi hiện tại, chuỗi dài nhất, tỷ lệ hoàn thành, lịch tháng (đã làm, bỏ lỡ, hôm nay, chưa tới, ngày nghỉ; chuyển tháng từ tháng bắt đầu tới tháng này), biểu đồ 4 tuần gần nhất. Chạm một ngày đã qua trên lịch để bổ sung hoặc bỏ đánh dấu; nút ở cuối đánh dấu hôm nay xong cả mục tiêu.
@@ -109,6 +110,7 @@ utils/                     vi_date (ngày giờ tiếng Việt, tên thứ, "Th�
 screens/home_shell.dart    khung 5 tab (tab đang mở do ShellController giữ)
 app/settings_controller.dart  cài đặt lưu bằng shared_preferences (key: docs/DATA_CONTRACT.md mục 8)
 app/shell_controller.dart  tab đang mở; app/routes.dart tên các màn không phải tab
+features/stats/            stats_screen, stats_logic (kỳ, so sánh, đúng hạn, ngày liên tiếp, biểu đồ, theo nhãn)
 features/calendar/         calendar_screen, calendar_logic (lưới tháng/tuần, ◀ ▶, dải giờ, việc của ngày)
 features/habits/           habits_screen, habit_detail_screen, habit_edit_screen, habit_archived_screen, habit_logic, habit_detail_logic (lịch tháng, tuần, tỷ lệ)
 features/focus_history/    focus_history_screen, focus_history_logic (gom nhóm, tóm tắt, định dạng)
