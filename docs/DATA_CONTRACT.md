@@ -127,8 +127,8 @@ Từ bước 1, lấy repository qua Provider, ví dụ `context.read<TaskReposi
 |---|---|---|
 | `watchAll()` | Hôm nay | mọi việc, cả việc đã xong; chia nhóm Quá hạn/Hôm nay/Sắp tới làm trong bộ nhớ (`groupTasks`) |
 | `getAll()` | chưa màn nào dùng | như `watchAll`, đọc một lần (dự phòng) |
-| `watchByDay(day)` | Lịch (timeline) | việc có `due` trong ngày, sắp theo `due`; không gồm việc không có ngày |
-| `watchByRange(range)` | Lịch tháng/tuần (chấm dưới ngày) | việc có `due` trong khoảng |
+| `watchByDay(day)` | (dự phòng, chưa màn nào dùng) | việc có `due` trong ngày, sắp theo `due`; không gồm việc không có ngày |
+| `watchByRange(range)` | Lịch (chấm dưới ngày, dải giờ và danh sách việc của ngày đang chọn) | việc có `due` trong khoảng |
 | `getUnfinished()` | Nhắc việc (C) | việc chưa xong, để lên lịch lại thông báo khi mở app |
 | `getById(id)`, `watchById(id)` | Chi tiết, Sửa việc | trả `null` nếu không có |
 | `search(query)` | Tìm kiếm | tìm trong tiêu đề, ghi chú, tên nhãn; không phân biệt hoa thường và dấu tiếng Việt ("hoc tap" ra "Học tập", chuẩn hóa bằng `foldVietnamese`); `query` rỗng → `[]`. Lọc Chưa xong/Đã xong/theo nhãn thì màn tự làm |
@@ -204,6 +204,11 @@ Code nằm ở `lib/data/habit_streak.dart`, đã có test. E muốn đổi quy 
 - "Tìm gần đây" lưu bằng shared_preferences, key `search_recent` (danh sách chuỗi, mới nhất trước, tối đa 5, không trùng không phân biệt hoa thường). Từ khóa được ghi nhớ khi nhấn Enter hoặc khi bấm vào một kết quả.
 
 **C (Lịch, nhắc việc, thống kê)**
+- Lịch đọc việc bằng một `watchByRange` cho cả tháng của ngày đang chọn, thêm 7 ngày mỗi phía (đủ cho các ngày mờ của tháng trước/sau trên lưới và cho tuần chứa ngày đang chọn); chỉ đọc lại khi ngày đang chọn sang tháng khác. Việc không có ngày không hiện trên Lịch.
+  - ◀ ▶: xem Tháng thì sang tháng trước/sau và chọn ngày 1 (về tháng hiện tại thì chọn hôm nay); xem Tuần thì lùi/tiến 7 ngày. Chạm ngày mờ của tháng khác thì sang tháng đó. Hàng thứ theo `week_start`.
+  - Chấm dưới ngày: ngày có ít nhất một việc (kể cả đã xong).
+  - Dải giờ: việc có giờ của ngày, từ 1 giờ trước việc sớm nhất tới 1 giờ sau việc muộn nhất (hôm nay thì mở rộng để có vạch giờ hiện tại). Việc chỉ có giờ bắt đầu hiện 30 phút; việc kéo sang ngày sau cắt ở 24:00; việc trùng giờ chia cột. Màu khối theo màu nhãn (không nhãn: xám).
+  - Danh sách việc của ngày: chưa xong trước, rồi việc có giờ theo giờ bắt đầu, việc cả ngày ở cuối. Việc chưa xong của ngày đã qua hiện là quá hạn (như màn Hôm nay). Hoàn thành việc lặp lại cũng tạo lần kế tiếp như ở Hôm nay.
 - id thông báo = `stableIntId(task.id)`. Khi mở app, lên lịch lại từ `getUnfinished()`.
 - Việc không có giờ (`hasTime = false`) thì nhắc lúc mấy giờ do C chọn, rồi ghi quyết định vào đây.
 - Đề xuất cách tính "đúng hạn" (C chốt rồi ghi lại vào đây):
@@ -288,3 +293,4 @@ Màn Tìm kiếm tự lưu "tìm gần đây" bằng key bắt đầu bằng `se
 | 1.6 | 10/11/2026 | Màn Lịch sử tập trung: chốt ở mục 6 (D) ý nghĩa ba tab, khoảng hiển thị, các ô tóm tắt và cách xóa/hoàn tác. Schema database không đổi |
 | 1.7 | 10/11/2026 | Bước 6a (Thói quen): chốt ở mục 6 (E) cách chấm trong ngày, thói quen không có lịch hôm nay, luật form Thêm/sửa, lưu trữ và xóa hẳn. Schema database không đổi |
 | 1.8 | 10/11/2026 | Bước 6b (Chi tiết thói quen): chốt ở mục 6 (E) cách tính Hoàn thành %, trạng thái ô lịch, 4 tuần gần nhất và việc bổ sung ngày đã qua. Schema database không đổi |
+| 1.9 | 10/11/2026 | Bước 7a (Lịch): chốt ở mục 6 (C) khoảng đọc việc, ◀ ▶, chấm dưới ngày, dải giờ và thứ tự danh sách việc của ngày; bảng mục 4 ghi Lịch dùng `watchByRange`. Schema database không đổi |
