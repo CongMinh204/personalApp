@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../app/shell_controller.dart';
 import '../features/calendar/calendar_screen.dart';
 import '../features/habits/habits_screen.dart';
+import '../features/stats/stats_screen.dart';
 import '../features/timer/timer_screen.dart';
 import '../features/today/today_screen.dart';
 
@@ -27,7 +28,7 @@ class _HomeShellState extends State<HomeShell> {
           const TodayScreen(),
           const CalendarScreen(),
           const TimerScreen(),
-          const _ComingSoon(title: 'Thống kê', icon: Icons.insights_rounded),
+          const StatsScreen(),
           const HabitsScreen(),
         ],
       ),
@@ -61,52 +62,6 @@ class _HomeShellState extends State<HomeShell> {
             label: 'Thói quen',
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ComingSoon extends StatelessWidget {
-  const _ComingSoon({required this.title, required this.icon});
-
-  final String title;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-
-    return SafeArea(
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                color: scheme.primaryContainer,
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: Icon(icon, size: 40, color: scheme.onPrimaryContainer),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              title,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Sắp có',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: scheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
