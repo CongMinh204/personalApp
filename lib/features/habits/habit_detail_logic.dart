@@ -4,6 +4,8 @@ import '../../utils/dates.dart';
 import '../../utils/vi_date.dart';
 import 'habit_logic.dart';
 
+export '../../utils/vi_date.dart' show monthTitle, weekdayHeaders;
+
 /// Trạng thái của một ngày trên lịch tháng.
 enum DayStatus {
   /// Có lịch và đã đủ mục tiêu.
@@ -64,15 +66,6 @@ DayStatus dayStatus(
 /// đã xong thì bỏ xong (về 0), chưa xong thì xong ngay cả mục tiêu.
 int toggledDayCount(Habit habit, int count) =>
     isDone(habit, count) ? 0 : habit.goalPerDay;
-
-/// Tên các cột thứ của lịch theo ngày đầu tuần: ["T2", …, "CN"] khi tuần bắt
-/// đầu từ Thứ Hai.
-List<String> weekdayHeaders(int weekStart) => [
-  for (var i = 0; i < 7; i++) weekdayShort((weekStart - 1 + i) % 7 + 1),
-];
-
-/// "Tháng 10, 2026".
-String monthTitle(DateTime month) => 'Tháng ${month.month}, ${month.year}';
 
 DateTime _firstOfMonth(DateTime d) => DateTime(d.year, d.month);
 
